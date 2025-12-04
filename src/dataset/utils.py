@@ -73,6 +73,16 @@ def create_dataset(ROOT, add_images = True):
             "shape": (1,),
             "names": ["obj_names"], # names of the objects
         }
+        features['obj_q_names'] = {
+            "dtype": "string",
+            "shape": (1,),
+            "names": ["obj_q_names"], # names of the objects with q states
+        }
+        features['obj_q_states'] = {
+            "dtype": "float32",
+            "shape": (10,),
+            "names": ["obj_q_states"], # q states of the objects
+        }
     dataset = LeRobotDataset.create(
             repo_id="transformed_data",
             root = ROOT,
@@ -130,6 +140,8 @@ def iterate_episodes(dataset,transformed_dataset, omy_env, ik_env,q_init, start_
                 obj_states, recp_q_poses = omy_env.get_object_pose(pad=10)
                 frame['obj_pose'] = np.array(obj_states['poses'],dtype=np.float32),
                 frame['obj_names'] = ','.join(obj_states['names'])
+                frame['obj_q_names'] = ','.join(recp_q_poses['names'])
+                frame['obj_q_states'] = np.array(recp_q_poses['q_states'],dtype=np.float32)
             transformed_dataset.add_frame(
                 frame, task=language_instruction
             )
