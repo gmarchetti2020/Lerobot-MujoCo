@@ -1,7 +1,4 @@
-# KU-DEEP-LEARNING Term Project
-
-Frequently asked questions will be described on [qa.md](qa.md). Please check qa file before posting the issue.
-
+# Lerobot-MujoCo-Custom-Policy-Tutorial
 
 ## Install
 ```
