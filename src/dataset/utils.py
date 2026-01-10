@@ -29,11 +29,11 @@ def transform_action(data, omy_env, ik_env, action_type):
     raise NotImplementedError
 
 def parse_object_info(data):
-    obj_pose = data['obj_pose'].numpy()
-    obj_names = data['obj_names']
+    obj_pose = data['env.obj_pose'].numpy()
+    obj_names = data['env.obj_names']
     obj_names = obj_names.split(',')
-    recp_q_states = data['obj_q_states'].numpy()
-    recp_q_names = data['obj_q_names']
+    recp_q_states = data['env.obj_q_states'].numpy()
+    recp_q_names = data['env.obj_q_names']
     recp_q_names = recp_q_names.split(',')
     return obj_pose, obj_names, recp_q_states, recp_q_names
 
@@ -115,6 +115,7 @@ def iterate_episodes(dataset,transformed_dataset, omy_env, ik_env,q_init, start_
             frame = {
                 "observation.state": observation,
                 "action": action.astype(np.float32),
+                'task': language_instruction
             }
             if args.observation_type == 'image':
                 agent_image = Image.fromarray(agent_image)
@@ -149,7 +150,7 @@ def iterate_episodes(dataset,transformed_dataset, omy_env, ik_env,q_init, start_
                 obj_states_final = np.concatenate([obj_states_sorted, recp_q_poses_sorted])
                 frame["observation.environment_state"] = obj_states_final
             transformed_dataset.add_frame(
-                frame, task=language_instruction
+                frame, 
             )
             omy_env.render()
             current_step += 1
@@ -163,17 +164,17 @@ def make_teleoperation_dataset(ROOT):
             robot_type="omy",
             fps=20,
             features={
-                "image": {
+                "observation.image": {
                     "dtype": "image",
                     "shape": (256, 256, 3),
                     "names": ["height", "width", "channels"],
                 },
-                "wrist_image": {
+                "observation.wrist_image": {
                     "dtype": "image",
                     "shape": (256, 256, 3),
                     "names": ["height", "width", "channels"],
                 },
-                "state": {
+                "observation.state": {
                     "dtype": "float32",
                     "shape": (10,),
                     "names": ["state"], # joint angles
@@ -183,32 +184,32 @@ def make_teleoperation_dataset(ROOT):
                     "shape": (7,),
                     "names": ["action"], # [q target, gripper]
                 },
-                "eef_pose": {
+                "observation.eef_pose": {
                     "dtype": "float32",
                     "shape": (7,),
                     "names": ["eef_pose"], # [x,y,z, r, p, y, gripper]
                 },
-                "obj_pose": {
+                "env.obj_pose": {
                     "dtype": "float32",
                     "shape": (10, 6),
                     "names": ["obj_pose"], # just the initial position of the object. Not used in training.
                 },
-                "obj_names": {
+                "env.obj_names": {
                     "dtype": "string",
                     "shape": (1,),
                     "names": ["obj_names"], # names of the objects
                 },
-                "obj_q_names": {
+                "env.obj_q_names": {
                     "dtype": "string",
                     "shape": (1,),
                     "names": ["obj_q_names"], # names of the objects with q states
                 },
-                "obj_q_states": {
+                "env.obj_q_states": {
                     "dtype": "float32",
                     "shape": (10,),
                     "names": ["obj_q_states"], # q states of the objects
                 },
-                "config_file_name": {
+                "env.config_file_name": {
                     "dtype": "string",
                     "shape": (1,),
                     "names": ["file_name"], # names of the objects
