@@ -157,9 +157,9 @@ def iterate_episodes(dataset,transformed_dataset, omy_env, ik_env,q_init, start_
     return success
 
 
-def make_teleoperation_dataset(ROOT):
+def make_teleoperation_dataset(ROOT, repo_id="temp", action_dim=7, state_dim=10):
     dataset = LeRobotDataset.create(
-            repo_id="temp",
+            repo_id=repo_id,
             root = ROOT,
             robot_type="omy",
             fps=20,
@@ -176,12 +176,12 @@ def make_teleoperation_dataset(ROOT):
                 },
                 "observation.state": {
                     "dtype": "float32",
-                    "shape": (10,),
+                    "shape": (state_dim,),
                     "names": ["state"], # joint angles
                 },
                 "action": {
                     "dtype": "float32",
-                    "shape": (7,),
+                    "shape": (action_dim,),
                     "names": ["action"], # [q target, gripper]
                 },
                 "observation.eef_pose": {
