@@ -2,7 +2,7 @@
 from src.mujoco_helper.transforms import rpy2r, r2rpy
 import numpy as np
 from PIL import Image
-from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 def transform_action(data, omy_env, ik_env, action_type):
     target_q = data['action'].numpy()

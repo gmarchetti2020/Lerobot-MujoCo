@@ -21,7 +21,7 @@ It contains downloading a dataset from huggingface and visualizing it.
 
 First, download the dataset
 ```
-python download_data.py
+python -m lerobot.datasets.v30.convert_dataset_v21_to_v30 --repo-id=Jeongeun/deep_learning_2025
 ```
 
 

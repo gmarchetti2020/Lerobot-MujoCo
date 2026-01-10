@@ -4,7 +4,7 @@ import numpy as np
 import os
 from PIL import Image
 from src.env.env import RILAB_OMY_ENV
-from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
 from src.controllers import load_controller
 import gc, argparse
 import json
@@ -111,17 +111,18 @@ def main(args):
                 #     # continue
                 else:
                     dataset.add_frame( {
-                            "image": agent_image,
-                            "wrist_image": wrist_image,
-                            "state": joint_q_full,
+                            "observation.image": agent_image,
+                            "observation.wrist_image": wrist_image,
+                            "observation.state": joint_q_full,
                             "action": action,
-                            "eef_pose": eef_pose,
-                            'obj_pose': np.array(obj_states['poses'],dtype=np.float32),
-                            "obj_names": ','.join(obj_states['names']),
-                            "obj_q_names": ','.join(recp_q_poses['names']),
-                            "obj_q_states": np.array(recp_q_poses['poses'],dtype=np.float32),
-                            "config_file_name": config_file_path,
-                        }, task=language_instruction
+                            "observation.eef_pose": eef_pose,
+                            'env.obj_pose': np.array(obj_states['poses'],dtype=np.float32),
+                            "env.obj_names": ','.join(obj_states['names']),
+                            "env.obj_q_names": ','.join(recp_q_poses['names']),
+                            "env.obj_q_states": np.array(recp_q_poses['poses'],dtype=np.float32),
+                            "env.config_file_name": config_file_path,
+                            "task": language_instruction
+                        }, 
                     )
             last_q = joint_q_full    
             last_obj_poses = obj_poses
@@ -129,7 +130,7 @@ def main(args):
             omy_env.render(language_instruction, guideline= f' [Num Episode: {episode_id}/{args.num_trials}]')
         omy_env.env.sync_sim_wall_time()
     omy_env.env.close_viewer()
-    dataset.stop_image_writer()
+    dataset.finalize()
     # leader.close()
     
 if __name__ == "__main__":

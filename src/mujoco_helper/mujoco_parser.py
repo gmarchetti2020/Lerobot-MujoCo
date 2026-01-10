@@ -1097,7 +1097,7 @@ class MuJoCoParserClass(object):
         # Reset wall time
         self.init_sim_time    = self.data.time
         self.init_wall_time   = time.time()
-        self.accum_wall_time  = 0.0  # 누적 wall 시간
+        self.accum_wall_time  = 0.0  # Accumulated wall time
         self.last_wall_update = time.time()
         # Others
         self.xyz_left_double_click = None 

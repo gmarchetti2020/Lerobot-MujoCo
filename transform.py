@@ -5,7 +5,7 @@ import numpy as np
 import os
 from PIL import Image
 import json
-from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
 from src.env.env import RILAB_OMY_ENV
 from src.mujoco_helper.transforms import rpy2r, r2rpy
 import torch
@@ -30,8 +30,8 @@ def main(args):
     ik_env = MuJoCoParserClass(name='IK_env',rel_xml_path='./asset/scene_table.xml')
     for episode_index in range(metadata.total_episodes):
         
-        start_idx_ori = dataset.episode_data_index['from'][episode_index].item()
-        end_idx_ori = dataset.episode_data_index['to'][episode_index].item()
+        start_idx_ori = dataset.meta.episodes[episode_index]["dataset_from_index"]
+        end_idx_ori = dataset.meta.episodes[episode_index]["dataset_to_index"]
         q_init = dataset.hf_dataset[start_idx_ori]['action'].numpy()
         language_instruction = dataset.hf_dataset[start_idx_ori]['task_index'].item()
         language_instruction = metadata.tasks[language_instruction]
@@ -52,6 +52,7 @@ def main(args):
                 else:
                     transformed_dataset.clear_episode_buffer()
         gc.collect()
+        transformed_dataset.finalize()
         torch.cuda.empty_cache()
 
 if __name__ == "__main__":

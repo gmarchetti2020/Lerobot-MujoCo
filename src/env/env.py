@@ -70,7 +70,7 @@ class RILAB_OMY_ENV:
     def reset(self, seed = None, leader_pose = True):
         self.env.reset_wall_time()
         self.restore_original_color()
-        if seed != None: np.random.seed(seed=0) 
+        if seed != None: np.random.seed(seed=seed) 
         # print(self.cfg['init_pose']['robot'])
         # self.env.reset()
         mujoco.mj_resetData(self.env.model,self.env.data) # reset data
@@ -238,30 +238,12 @@ class RILAB_OMY_ENV:
             return np.concatenate([qpos, eef_pose], dtype=np.float32)
         else:
             raise NotImplementedError(f"Observation type {self.obs_type} not implemented.")
-    def infer_other_actions(self):
-        p, R = self.env.get_pR_body(body_name=self.tcp_link_name) #'ur_tcp_link')
-        dp = p - self.p0
-        dR = R.dot(self.R0.T)
-        drpy = r2rpy(dR)
-        delta_eef = np.concatenate([dp, drpy],dtype=np.float32)
-        qpos = self.env.get_qpos_joints(joint_names=self.joint_names)
-        self.p0, self.R0 = p, R
-        gripper_state = self.env.get_qpos_joints(joint_names=['rh_l1', 'rh_l2'])
-        if gripper_state[0] < 0.5:
-            gripper_state_val = 0.0
-        else:
-            gripper_state_val = 1.0
-        return {
-            'delta_eef': delta_eef.astype(np.float32),
-            'eef_pose': np.concatenate([p, r2rpy(R)],dtype=np.float32),
-            'joint_pos': qpos.astype(np.float32),
-            'gripper_state': np.array([gripper_state_val], dtype=np.float32)
-        }
-    def get_full_joint_state(self):
-        # Get the full joint state including gripper
-        joint_names = self.env.rev_joint_names[:10]
-        return self.env.get_qpos_joints(joint_names=joint_names).astype(np.float32)
     
+    def solve_ik_eef_only(self, target_pos, target_R):
+        pass
+    def get_joint_state(self):
+        # Get the full joint state including gripper
+        pass
     def get_ee_pose(self):
         p, R = self.env.get_pR_body(body_name=self.tcp_link_name) #'ur_tcp_link')
         rpy = r2rpy(R)

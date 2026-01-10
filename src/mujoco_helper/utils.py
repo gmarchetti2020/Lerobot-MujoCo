@@ -339,7 +339,7 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     pretty_xml = reparsed.toprettyxml(indent="    ")
     
-    # 불필요한 공백 제거 (빈 줄)
+    # Remove unnecessary whitespace (blank lines)
     lines = [line for line in pretty_xml.splitlines() if line.strip()]
     return "\n".join(lines)
 
