@@ -10,4 +10,4 @@ git+https://github.com/huggingface/transformers.git@fix/lerobot_openpi
 # gr00t
 "torch>=2.2.1,<2.8.0" "torchvision>=0.21.0,<0.23.0" # --index-url https://download.pytorch.org/whl/cu1XX
 ninja "packaging>=24.2,<26.0" # flash attention dependencies
-"flash-attn>=2.5.9,<3.0.0" --no-build-isolation
+peft
