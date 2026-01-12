@@ -18,9 +18,11 @@ src
     |- baseline
        |- configuration.py
        |- modeling.py
+       |- processor.py
     |[Your policy]
        |- configuration.py
        |- modeling.py
+       |- processor.py
 ```
 
 ## 1️⃣ Configuration File
@@ -233,6 +235,17 @@ class YourPolicy(PreTrainedPolicy):
             self._action_queue.extend(actions)
         return self._action_queue.popleft()
 
+    def predict_action_chunk(self, batch: dict[str, Tensor]) -> Tensor:
+        """Predict action chunks given environment observations.
+
+        This method returns the full action chunk predicted by the model for the given batch of observations.
+        """
+        self.eval()
+        if self.config.image_features:
+            batch = dict(batch)  
+        actions = self.model(batch)
+        return actions
+
     def forward(self, batch: dict[str, Tensor]) -> tuple[Tensor, dict]:
             batch = self.normalize_inputs(batch)
             """Run the batch through the model and compute the loss for training or validation."""
@@ -251,9 +264,109 @@ class YOURPOLICYMODEL(nn.Module):
         '''
         Build Model than returns action
         '''
+
+    def get_optim_params(self) -> dict:
+        # return parameters for optimizer
+        # You can change if needed
+
+    def reset(self):
+        """This should be called whenever the environment is reset."""
+        self._action_queue = deque([], maxlen=self.config.n_action_steps)
+
+     @torch.no_grad()
+    def select_action(self, batch: dict[str, Tensor]) -> Tensor:
+        """Select a single action given environment observations.
+        This method wraps `select_actions` in order to return one action at a time for execution in the
+        environment. It works by managing the actions in a queue and only calling `select_actions` when the
+        queue is empty.
+        """
+
+    def predict_action_chunk(self, batch: dict[str, Tensor]) -> Tensor:
+        """Predict action chunks given environment observations.
+
+        This method returns the full action chunk predicted by the model for the given batch of observations.
+        """
+        
     def forward(self, batch: dict[str, Tensor]) -> Tensor:
         '''
         Input: batch dict with keys OBS_IMAGES, OBS_STATE, OBS_ENV_STATE
         Output: actions [B, chunk_size, action_dim]
         '''
+```
+
+## 2️⃣ Preprocessor/Postprocessor
+This is for normalizing input and outputs
+
+```python
+from typing import Any
+
+import torch
+
+from .configuration import BaselineConfig
+from lerobot.processor import (
+    AddBatchDimensionProcessorStep,
+    DeviceProcessorStep,
+    NormalizerProcessorStep,
+    PolicyAction,
+    PolicyProcessorPipeline,
+    RenameObservationsProcessorStep,
+    UnnormalizerProcessorStep,
+)
+from lerobot.processor.converters import policy_action_to_transition, transition_to_policy_action
+from lerobot.utils.constants import POLICY_POSTPROCESSOR_DEFAULT_NAME, POLICY_PREPROCESSOR_DEFAULT_NAME
+
+
+def make_baseline_pre_post_processors(
+    config: BaselineConfig,
+    dataset_stats: dict[str, dict[str, torch.Tensor]] | None = None,
+) -> tuple[
+    PolicyProcessorPipeline[dict[str, Any], dict[str, Any]],
+    PolicyProcessorPipeline[PolicyAction, PolicyAction],
+]:
+    """Creates the pre- and post-processing pipelines for the ACT policy.
+
+    The pre-processing pipeline handles normalization, batching, and device placement for the model inputs.
+    The post-processing pipeline handles unnormalization and moves the model outputs back to the CPU.
+
+    Args:
+        config (ACTConfig): The ACT policy configuration object.
+        dataset_stats (dict[str, dict[str, torch.Tensor]] | None): A dictionary containing dataset
+            statistics (e.g., mean and std) used for normalization. Defaults to None.
+
+    Returns:
+        tuple[PolicyProcessorPipeline[dict[str, Any], dict[str, Any]], PolicyProcessorPipeline[PolicyAction, PolicyAction]]: A tuple containing the
+        pre-processor pipeline and the post-processor pipeline.
+    """
+
+    input_steps = [
+        RenameObservationsProcessorStep(rename_map={}),
+        AddBatchDimensionProcessorStep(),
+        DeviceProcessorStep(device=config.device),
+        NormalizerProcessorStep(
+            features={**config.input_features, **config.output_features},
+            norm_map=config.normalization_mapping,
+            stats=dataset_stats,
+            device=config.device,
+        ),
+    ]
+    output_steps = [
+        UnnormalizerProcessorStep(
+            features=config.output_features, norm_map=config.normalization_mapping, stats=dataset_stats
+        ),
+        DeviceProcessorStep(device="cpu"),
+    ]
+
+    return (
+        PolicyProcessorPipeline[dict[str, Any], dict[str, Any]](
+            steps=input_steps,
+            name=POLICY_PREPROCESSOR_DEFAULT_NAME,
+        ),
+        PolicyProcessorPipeline[PolicyAction, PolicyAction](
+            steps=output_steps,
+            name=POLICY_POSTPROCESSOR_DEFAULT_NAME,
+            to_transition=policy_action_to_transition,
+            to_output=transition_to_policy_action,
+        ),
+    )
+
 ```

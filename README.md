@@ -32,7 +32,11 @@ dataset = LeRobotDataset('Jeongeun/deep_learning_2025',root = root )
 ```
 Running this code will download the dataset independently.
 
-### 2.transform.ipynb
+### 2.train.ipynb
+
+### 3.eval.ipynb
+
+### 10.transform.ipynb
 Define the action and observation space for the environment. 
 ```python
 action_type = 'delta_joint'  # Options: 'joint','delta_joint, 'delta_eef_pose', 'eef_pose'
@@ -55,7 +59,7 @@ You can just use the python script to do this as well.
 python transform.py --action_type delta_eef_pose --proprio_type eef_pose --observation_type image --image_aug_num 2
 ```
 
-### 3.train.ipynb
+### 11.train_custom.ipynb
 Train simple MLP models with the dataset.
 
 First, set up the configurations
@@ -131,7 +135,7 @@ python train_custom.py
   --freeze_backbone FREEZE_BACKBONE
 ```
 
-### 4.eval.ipynb
+### 12.eval_custom.ipynb
 
 This file contains an evaluation of the trained models.
 
