@@ -220,8 +220,7 @@ class RILAB_OMY_ENV:
         else:
             gripper_state_val = 1.0
         if self.obs_type == 'joint_pos':
-            qpos = self.env.get_qpos_joints(joint_names=self.joint_names)
-            return np.concatenate([qpos, [gripper_state_val]], dtype=np.float32)
+            return self.get_joint_state()
         elif self.obs_type == 'eef_pose':
             eef_pose = self.get_ee_pose()
             eef_pose = np.concatenate([eef_pose, [gripper_state_val]], dtype=np.float32)
