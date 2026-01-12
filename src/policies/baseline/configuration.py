@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 
 from lerobot.configs.policies import PreTrainedConfig
 from lerobot.configs.types import NormalizationMode
-from lerobot.common.optim.optimizers import AdamWConfig
-from lerobot.common.optim.schedulers import CosineDecayWithWarmupSchedulerConfig
+from lerobot.optim.optimizers import AdamWConfig
+from lerobot.optim.schedulers import CosineDecayWithWarmupSchedulerConfig
 @PreTrainedConfig.register_subclass("omy_baseline")
 @dataclass
 class BaselineConfig(PreTrainedConfig):
@@ -82,7 +82,7 @@ class BaselineConfig(PreTrainedConfig):
     normalization_mapping: dict[str, NormalizationMode] = field(
         default_factory=lambda: {
             "STATE": NormalizationMode.MEAN_STD,
-            "ENVIRONMENT_STATE": NormalizationMode.MEAN_STD,
+            "ENV": NormalizationMode.MEAN_STD,
             "ACTION": NormalizationMode.MEAN_STD,
         }
     )

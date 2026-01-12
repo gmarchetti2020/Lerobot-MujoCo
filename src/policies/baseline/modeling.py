@@ -14,12 +14,11 @@ from torch import Tensor, nn
 from torchvision.models._utils import IntermediateLayerGetter
 from torchvision.ops.misc import FrozenBatchNorm2d
 
-from lerobot.common.policies.pretrained import PreTrainedPolicy
-from lerobot.common.constants import ACTION, OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE
+from lerobot.policies.pretrained import PreTrainedPolicy
+from lerobot.utils.constants import ACTION, OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE
 
 from .configuration import BaselineConfig
 from transformers import AutoImageProcessor, AutoModel
-from lerobot.common.policies.normalize import Normalize, Unnormalize
 
 class BaselinePolicy(PreTrainedPolicy):
     """
@@ -35,7 +34,6 @@ class BaselinePolicy(PreTrainedPolicy):
     def __init__(
         self,
         config: BaselineConfig,
-        dataset_stats: dict[str, dict[str, Tensor]] | None = None,
 
     ):
         """
@@ -46,14 +44,6 @@ class BaselinePolicy(PreTrainedPolicy):
         super().__init__(config)
         config.validate_features()
         self.config = config
-
-        self.normalize_inputs = Normalize(config.input_features, config.normalization_mapping, dataset_stats)
-        self.normalize_targets = Normalize(
-            config.output_features, config.normalization_mapping, dataset_stats
-        )
-        self.unnormalize_outputs = Unnormalize(
-            config.output_features, config.normalization_mapping, dataset_stats
-        )
         if config.backbone == 'mlp':
             self.model = BaselineModel(config)
         elif config.backbone == 'transformer':
@@ -88,27 +78,31 @@ class BaselinePolicy(PreTrainedPolicy):
         """
         self.eval()  # keeping the policy in eval mode as it could be set to train mode while queue is consumed
         # Action queue logic for n_action_steps > 1. When the action_queue is depleted, populate it by
-        batch = self.normalize_inputs(batch)
         if self.config.image_features:
             batch = dict(batch)  
         if len(self._action_queue) == 0:
             actions = self.model(batch)[0][: self.config.n_action_steps, :]
-            actions = self.unnormalize_outputs({ACTION: actions})[ACTION]
-
             # `self.model.forward` returns a (batch_size, n_action_steps, action_dim) tensor, but the queue
             # effectively has shape (n_action_steps, batch_size, *), hence the transpose.
             self._action_queue.extend(actions)
         return self._action_queue.popleft()
+    
+    def predict_action_chunk(self, batch: dict[str, Tensor]) -> Tensor:
+        """Predict action chunks given environment observations.
+
+        This method returns the full action chunk predicted by the model for the given batch of observations.
+        """
+        self.eval()
+        if self.config.image_features:
+            batch = dict(batch)  
+        actions = self.model(batch)
+        return actions
 
     def forward(self, batch: dict[str, Tensor]) -> tuple[Tensor, dict]:
-        batch = self.normalize_inputs(batch)
         """Run the batch through the model and compute the loss for training or validation."""
         if self.config.image_features:
             batch = dict(batch)  # shallow copy so that adding a key doesn't modify the original
-        
-        batch = self.normalize_targets(batch)
         actions = self.model(batch)
-
         l1_loss = (
             F.l1_loss(batch[ACTION], actions, reduction="none") * ~batch["action_is_pad"].unsqueeze(-1)
         ).mean()

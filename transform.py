@@ -13,7 +13,7 @@ from src.dataset.utils import *
 from src.mujoco_helper import MuJoCoParserClass
 import gc
 def main(args):
-    dataset = LeRobotDataset('Jeongeun/deep_learning_2025',root = './dataset/demo_data')
+    dataset = LeRobotDataset('Jeongeun/tutorial_v2',root = './dataset/leader_data')
     metadata = dataset.meta
     if os.path.exists(args.path):
         import shutil
@@ -33,8 +33,8 @@ def main(args):
         start_idx_ori = dataset.meta.episodes[episode_index]["dataset_from_index"]
         end_idx_ori = dataset.meta.episodes[episode_index]["dataset_to_index"]
         q_init = dataset.hf_dataset[start_idx_ori]['action'].numpy()
-        language_instruction = dataset.hf_dataset[start_idx_ori]['task_index'].item()
-        language_instruction = metadata.tasks[language_instruction]
+        task_index = dataset.hf_dataset[start_idx_ori]['task_index'].item()
+        language_instruction = metadata.tasks.index[task_index]
         print(f"Episode {episode_index}, Instruction: {language_instruction}")
         # back to original colors
 
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument('--action_type', type=str, default='joint',choices=['joint','delta_joint','eef_pose','delta_eef_pose'],)
     parser.add_argument('--proprio_type', type=str, default='joint_pos', choices=['joint_pos','eef_pose'],)
     parser.add_argument('--observation_type', type=str, default='object_pose',choices=['image','object_pose'],)
-    parser.add_argument('--path', type=str, default='./dataset/transformed_data',)
+    parser.add_argument('--path', type=str, default='./dataset/transformed_data_image',)
     parser.add_argument('--image_aug_num', type=int, default=0,)
     args = parser.parse_args()
     main(args)

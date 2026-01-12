@@ -40,11 +40,11 @@ def main(args):
             make_new = True
     if make_new:
         print("CREATE")
-        dataset = make_teleoperation_dataset(ROOT)
+        dataset = make_teleoperation_dataset(ROOT, state_dim=8)
     action = np.zeros(12)
     record_flag = False
     just_reseted = True
-    last_q = omy_env.get_full_joint_state() #np.zeros(12)
+    last_q = omy_env.get_joint_state() #np.zeros(12)
     # zero_pose = np.array([-0.6442722678184509, -2.0621182918548584, 2.297856569290161, -0.26436978578567505, 0.9549943804740906, 0.037058718502521515])
     last_obj_poses = np.zeros((10, 6))
     while leader.action_data is None:
@@ -81,7 +81,7 @@ def main(args):
                 joint_q = omy_env.step(action)
             action = leader.get_action() #  , reset, fail
             eef_pose = omy_env.step(action)
-            joint_q_full = omy_env.get_full_joint_state()           
+            joint_q_full = omy_env.get_joint_state()           
             
             agent_image,wrist_image = omy_env.grab_image(return_side=False)
             # # resize to 256x256
@@ -136,7 +136,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_trials", type=int, default=50)
-    parser.add_argument("--root_dir", type=str, default='./dataset/demo_data')
+    parser.add_argument("--root_dir", type=str, default='./dataset/leader_data')
     parser.add_argument('--resume', action='store_true', default=False)
     args = parser.parse_args()
     os.makedirs(args.root_dir, exist_ok=True)

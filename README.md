@@ -115,7 +115,7 @@ Then you can train the baseline models!
 
 You can run this with the scripts as follows
 ```
-python train.py
+python train_custom.py
   --dataset_path DATASET_PATH
   --batch_size BATCH_SIZE
   --num_epochs NUM_EPOCHS

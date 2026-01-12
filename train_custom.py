@@ -1,12 +1,12 @@
 import argparse
-from lerobot.common.datasets.factory import make_dataset
+from lerobot.datasets.factory import make_dataset
 from lerobot.configs.train import TrainPipelineConfig
 from lerobot.configs.default import DatasetConfig
-from lerobot.common.datasets.utils import dataset_to_policy_features
-from lerobot.common.optim.factory import make_optimizer_and_scheduler
-from lerobot.common.datasets.utils import cycle
+from lerobot.datasets.utils import dataset_to_policy_features
+from lerobot.optim.factory import make_optimizer_and_scheduler
+from lerobot.datasets.utils import cycle
 from lerobot.configs.types import FeatureType
-from lerobot.common.utils.utils import (
+from lerobot.utils.utils import (
     format_big_number,
     get_safe_torch_device,
     has_method,

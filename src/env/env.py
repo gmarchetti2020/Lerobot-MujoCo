@@ -243,7 +243,10 @@ class RILAB_OMY_ENV:
         pass
     def get_joint_state(self):
         # Get the full joint state including gripper
-        pass
+        q = self.env.get_qpos_joints(joint_names=self.joint_names + ['rh_r1', 'rh_r2'])
+        q = np.asarray(q, dtype=np.float32)
+        return q
+    
     def get_ee_pose(self):
         p, R = self.env.get_pR_body(body_name=self.tcp_link_name) #'ur_tcp_link')
         rpy = r2rpy(R)
