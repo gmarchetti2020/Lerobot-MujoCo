@@ -35,6 +35,7 @@ A comprehensive tutorial for training and evaluating custom robotic manipulation
 
 ```bash
 pip install -r requirements.txt
+pip install flash-attn==2.7.3 --no-build-isolation
 ```
 
 ## 📁 Dataset: Teleoperation and Visualization
@@ -73,7 +74,7 @@ dataset = LeRobotDataset('Jeongeun/tutorial_v2', root=root)
 Running this code will automatically download the dataset.
 
 
-## 🏋️ Baseline Model Training
+## 🏋️ VLA Model Training
 
 ### 📌 Pi-0.5 Training
 **File:** `2.train.ipynb` (First Section)
@@ -180,10 +181,20 @@ lerobot-train \
 
 **⏱️ Training Time:** ~1-2 hours on single GPU
 ## 📈 Baseline Model Evaluation
+
+
+<img src="./media/pi05.gif" width="480" height="360"></img>
+
+| Model | Pi0.5 | Gr00T N1.5|
+|-------|-------|--------|
+|Success Rate| 80% |
+|Repository 🤗| [Jeongeun/tutorial_v2_pi05](https://huggingface.co/Jeongeun/tutorial_v2_pi05) | [Jeongeun/tutorial_v2_groot](https://huggingface.co/Jeongeun/tutorial_v2_groot)
+
 ### 📊 Pi-0.5 Evaluation
 **File:** `3.eval_pi05.ipynb`
 
 Evaluate the trained Pi-0.5 model on your environment.
+
 
 **Prerequisites:**
 ```bash
@@ -271,6 +282,10 @@ omy_env = RILAB_OMY_ENV(cfg=env_conf, action_type="joint", obs_type="joint_pos",
 ```
 
 **Run:** Same loop as Pi-0.5 — 20 episodes, max 10k steps, report average success.
+
+### 📊 Pi-0 Evaluation
+**File:** `5.eval_pi0.ipynb`
+
 
 ## Custom Policy Training and Evaluation
 ### 🔄 Data Transformation

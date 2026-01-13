@@ -7,10 +7,11 @@ torch==2.7.1 --index-url --index-url https://download.pytorch.org/whl/cu128
 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cu128
 transformers
 git+https://github.com/huggingface/lerobot.git@fbe4c8b94fdb1d62773e0f285f75aebb5b9ec27d
-ninja "packaging>=24.2,<26.0"
+
+ninja
+packaging>=24.2,<26.0
 dm-tree==0.1.9
 peft
-flash-attn==2.7.3 --no-build-isolation
 
 
 # pi0.5
