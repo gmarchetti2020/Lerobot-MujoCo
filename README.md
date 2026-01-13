@@ -12,7 +12,7 @@ A comprehensive tutorial for training and evaluating custom robotic manipulation
     - [📊 Dataset Visualization](#-dataset-visualization)
   - [🏋️ Baseline Model Training](#️-baseline-model-training)
     - [📌 Pi-0.5 Training](#-pi-05-training)
-    - [🚀 GR00T Training](#-gr00t-training)
+    - [🚀 GR00TN1.5 Training](#-gr00tn15-training)
   - [📈 Model Evaluation](#-model-evaluation)
     - [📊 Pi-0.5 Evaluation](#-pi-05-evaluation)
   - [Custom Policy Training and Evaluation](#custom-policy-training-and-evaluation)
@@ -131,7 +131,7 @@ lerobot-train \
 
 ---
 
-### 🚀 GR00T Training
+### 🚀 GR00TN1.5 Training
 **File:** `2.train.ipynb` (Second Section)
 
 Train GR00T N 1.5 model on your dataset.
