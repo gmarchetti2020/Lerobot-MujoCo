@@ -1,90 +1,136 @@
-# Lerobot-MujoCo-Custom-Policy-Tutorial
+# 🤖 LeRobot MuJoCo Tutorial v2
 
-## Install
+A comprehensive tutorial for training and evaluating custom robotic manipulation policies using LeRobot and MuJoCo simulation.
+
+## 📋 Table of Contents
+
+- [🤖 LeRobot MuJoCo Tutorial v2](#-lerobot-mujoco-tutorial-v2)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [🚀 Installation](#-installation)
+  - [📁 Project Structure](#-project-structure)
+    - [⌨️ Keyboard Teleoperation Demo](#️-keyboard-teleoperation-demo)
+    - [📊 Dataset Visualization](#-dataset-visualization)
+    - [🏋️ Model Training](#️-model-training)
+    - [🔄 Data Transformation](#-data-transformation)
+    - [🎓 Custom Policy Training](#-custom-policy-training)
+    - [✅ Custom Policy Evaluation](#-custom-policy-evaluation)
+  - [📊 Model Performance](#-model-performance)
+  - [🔧 Custom Policy Implementation](#-custom-policy-implementation)
+    - [📝 Training Your Custom Policy](#-training-your-custom-policy)
+    - [📝 Evaluating Your Custom Policy](#-evaluating-your-custom-policy)
+  - [📡 Data Collection with Leader Arm](#-data-collection-with-leader-arm)
+    - [✋ Prerequisites](#-prerequisites)
+    - [🔧 Procedure](#-procedure)
+  - [💬 Contact](#-contact)
+
+---
+
+## 🚀 Installation
+
+```bash
+pip install -r requirements.txt
 ```
-pip install -r requrements.txt
+
+## 📁 Project Structure
+
+### ⌨️ Keyboard Teleoperation Demo
+**File:** `0.teleop.ipynb`
+
+Interactive keyboard teleoperation for manual robot control and data collection.
+
+**Controls:**
+- **WASD** - XY plane movement
+- **R/F** - Z-axis movement
+- **Q/E** - Tilt adjustment
+- **Arrow Keys** - Rotation control
+- **Spacebar** - Toggle gripper state
+- **Z** - Reset environment (discard episode data)
+
+### 📊 Dataset Visualization
+**File:** `1.Visualize.ipynb`
+
+Download and visualize datasets from Hugging Face Hub.
+
+**Quick Start:**
+```bash
+python download_data.py
 ```
 
-## Files
-
-### 0.teleop.ipynb
-Contains keyboard teleoperation demo.
-
-Use WASD for the xy plane, RF for the z-axis, QE for tilt, and ARROWs for the rest of rthe otations.
-
-SPACEBAR will change your gripper's state, and Z key will reset your environment with discarding the current episode data.
-
-
-### 1.Visualize.ipynb
-
-It contains downloading a dataset from huggingface and visualizing it.
-
-First, download the dataset
-```
-python -m lerobot.datasets.v30.convert_dataset_v21_to_v30 --repo-id=Jeongeun/deep_learning_2025
-```
-
-
+**Python Usage:**
 ```python
-from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
-root = './dataset/demo_data'
-dataset = LeRobotDataset('Jeongeun/deep_learning_2025',root = root )
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
+
+root = './dataset/leader_data'
+dataset = LeRobotDataset('Jeongeun/tutorial_v2', root=root)
 ```
-Running this code will download the dataset independently.
 
-### 2.train.ipynb
+Running this code will automatically download the dataset.
 
-### 3.eval.ipynb
+### 🏋️ Model Training
+**Files:** 
+- `2.train.ipynb` - Baseline model training
+- `3.eval_pi05.ipynb` - Pi-0.5 model evaluation
+- `4.eval_groot.ipynb` - GRooT model evaluation
 
-### 10.transform.ipynb
-Define the action and observation space for the environment. 
+Train and evaluate baseline models with your data.
+
+### 🔄 Data Transformation
+**File:** `10.transform.ipynb`
+
+Define action and observation spaces, then transform your dataset for training.
+
+**Configuration:**
 ```python
-action_type = 'delta_joint'  # Options: 'joint','delta_joint, 'delta_eef_pose', 'eef_pose'
-proprio_type = 'eef_pose' # Options: 'joint', 'eef_pose'
-observation_type = 'image' # options: 'image', 'object_pose'
-image_aug_num = 2  # Number of augmented images to generate per original image
+action_type = 'delta_joint'      # 'joint' | 'delta_joint' | 'delta_eef_pose' | 'eef_pose'
+proprio_type = 'eef_pose'        # 'joint' | 'eef_pose'
+observation_type = 'image'       # 'image' | 'object_pose'
+image_aug_num = 2                # Number of augmented images per original image
 transformed_dataset_path = './dataset/transformed_data'
 ```
 
-Based on this configuration, it will transform the actions into the action_type and create new dataset for training. 
+**Configuration Details:**
+| Parameter | Description | Options |
+|-----------|-------------|---------|
+| `action_type` | Action representation format | `joint`, `delta_joint`, `eef_pose`, `delta_eef_pose` |
+| `proprio_type` | Proprioceptive information representation | `joint`, `eef_pose` |
+| `observation_type` | Input modality | `image`, `object_pose` |
+| `image_aug_num` | Augmented trajectories for image features | Integer |
 
-- action_type: representation of the actions. Options: 'joint','delta_joint','eef_pose','delta_eef_pose'
-- proprio_type: representations of proprioceptive information. Options: eef_pose, joint_pos
-- observation_type: whether to use the image of an object's position information. Options: 'image','objet_pose.'
-- image_aug_num: the number of augmented trajectories to make when you are using image features
-
-You can just use the python script to do this as well. 
-
+**Command Line Usage:**
+```bash
+python transform.py \
+  --action_type delta_eef_pose \
+  --proprio_type eef_pose \
+  --observation_type image \
+  --image_aug_num 2
 ```
-python transform.py --action_type delta_eef_pose --proprio_type eef_pose --observation_type image --image_aug_num 2
-```
 
-### 11.train_custom.ipynb
-Train simple MLP models with the dataset.
+### 🎓 Custom Policy Training
+**File:** `11.train_custom.ipynb`
 
-First, set up the configurations
+Train MLP or Transformer models with your transformed dataset.
+
+**Configuration Example:**
 ```python
 @PreTrainedConfig.register_subclass("omy_baseline")
 @dataclass
 class BaselineConfig(PreTrainedConfig):
-    # Input / output structure.
+    # Input / output structure
     n_obs_steps: int = 1
     chunk_size: int = 5
     n_action_steps: int = 5
 
-    # Architecture.
-    backbone: str = 'mlp' # 'mlp' or 'transformer'
-    # Vision encoder
-    vision_backbone: str ="facebook/dinov3-vitb16-pretrain-lvd1689m" #"facebook/dinov2-base"
-    projection_dim : int = 128
-    freeze_backbone:  bool = True
+    # Architecture
+    backbone: str = 'mlp'  # 'mlp' or 'transformer'
+    vision_backbone: str = "facebook/dinov3-vitb16-pretrain-lvd1689m"
+    projection_dim: int = 128
+    freeze_backbone: bool = True
 
-
-    # Num hidden layers
+    # Model dimensions
     n_hidden_layers: int = 5
-    hidden_dim: int = 512   
+    hidden_dim: int = 512
 
-    ## For transformer-based architectures
+    # Transformer-specific parameters
     n_heads: int = 4
     dim_feedforward: int = 2048
     feedforward_activation: str = "gelu"
@@ -92,130 +138,151 @@ class BaselineConfig(PreTrainedConfig):
     pre_norm: bool = True
     n_encoder_layers: int = 6
 
-    # Training preset
+    # Training parameters
     optimizer_lr: float = 1e-3
     optimizer_weight_decay: float = 1e-6
-
-    # Learning rate scheduler parameters 
     lr_warmup_steps: int = 1000
     total_training_steps: int = 500000
 
-# Policy Config
+# Initialize policy configuration
 cfg = BaselineConfig(
     chunk_size=10,
     n_action_steps=10,
     backbone='mlp',
-    optimizer_lr= 5e-4,
+    optimizer_lr=5e-4,
     n_hidden_layers=10,
     hidden_dim=512,
-    # If you are using image features, uncomment the following line
-    vision_backbone='facebook/dinov3-vitb16-pretrain-lvd1689m',#"facebook/dinov2-base", **You need access to use this model** Use dinov2 if you don't have access
+    vision_backbone='facebook/dinov3-vitb16-pretrain-lvd1689m',
     projection_dim=128,
     freeze_backbone=True,
-
 )
 ```
-Then you can train the baseline models!
 
-You can run this with the scripts as follows
-```
-python train_custom.py
-  --dataset_path DATASET_PATH
-  --batch_size BATCH_SIZE
-  --num_epochs NUM_EPOCHS
-  --ckpt_path CKPT_PATH
-  --chunk_size CHUNK_SIZE
-  --n_action_steps N_ACTION_STEPS
-  --learning_rate LEARNING_RATE
-  --backbone BACKBONE
-  --n_hidden_layers N_HIDDEN_LAYERS
-  --hidden_dim HIDDEN_DIM
-  --vision_backbone {facebook/dinov3-vitb16-pretrain-lvd1689m,facebook/dinov2-base}
-  --projection_dim PROJECTION_DIM
+**Command Line Training:**
+```bash
+python train_custom.py \
+  --dataset_path DATASET_PATH \
+  --batch_size BATCH_SIZE \
+  --num_epochs NUM_EPOCHS \
+  --ckpt_path CKPT_PATH \
+  --chunk_size CHUNK_SIZE \
+  --n_action_steps N_ACTION_STEPS \
+  --learning_rate LEARNING_RATE \
+  --backbone BACKBONE \
+  --n_hidden_layers N_HIDDEN_LAYERS \
+  --hidden_dim HIDDEN_DIM \
+  --vision_backbone {facebook/dinov3-vitb16-pretrain-lvd1689m,facebook/dinov2-base} \
+  --projection_dim PROJECTION_DIM \
   --freeze_backbone FREEZE_BACKBONE
 ```
 
-### 12.eval_custom.ipynb
+### ✅ Custom Policy Evaluation
+**File:** `12.eval_custom.ipynb`
 
-This file contains an evaluation of the trained models.
+Evaluate your trained policies in simulation environment.
 
-<img src="./media/baseline.gif" width="480" height="360" controls></img>
+<img src="./media/baseline.gif" width="480" height="360"></img>
 
+---
 
-Action Representation: Target Joint Position, State Representation: Current Joint Position
-We do not added color agumented image from training vision models. 
+## 📊 Model Performance
 
-<table> Success rate from Clean Image Env. -  Noisy Color Image Env.
-    <tr>
-    <th> <a href="https://huggingface.co/Jeongeun/mlp_obj_deep_learning_2025_joint">  MLP with GT Object Pose </th>
-    <th><a href="https://huggingface.co/Jeongeun/mlp_image_deep_learning_2025_joint">   MLP with Image (DINOv3 feature)</th>
-    <th> <a href="https://huggingface.co/Jeongeun/smolvla_deep_learning_2025_joint"> SmolVLA with Image </th>
-    </tr>
-    <tr>
-    <th>  65%</th>
-    <th> 50% - 40%</th>
-    <th>65% - 10% </th>
-    </tr>
-</table>
+| Model | Clean Image | Noisy Color Image |
+|-------|:---:|:---:|
+| [🎯 MLP with GT Object Pose](https://huggingface.co/Jeongeun/mlp_obj_deep_learning_2025_joint) | 65% ✅ | 65% ✅ |
+| [🖼️ MLP with Image (DINOv3)](https://huggingface.co/Jeongeun/mlp_image_deep_learning_2025_joint) | 50% | 40% |
+| [🚀 SmolVLA with Image](https://huggingface.co/Jeongeun/smolvla_deep_learning_2025_joint) | 65% ✅ | 10% ⚠️ |
 
-## Try with your own policy
-Look at [src/policies/README.md](./src/policies/README.md) for instructions. 
+> **Note:** Action: Target Joint Position | State: Current Joint Position
+> 
+> ⚠️ Color augmentation was not applied during vision model training.
 
+---
 
-For training change [3.train.ipynb](3.train.ipynb)
-```python 
-from src.policies.baseline.configuration import BaselineConfig
-from src.policies.baseline.modeling import BaselinePolicy
-```
-to your own path in  the **first** cell and
+## 🔧 Custom Policy Implementation
 
+👉 Refer to [src/policies/README.md](./src/policies/README.md) for detailed instructions.
+
+### 📝 Training Your Custom Policy
+
+In `11.train_custom.ipynb`, update the **first cell**:
 ```python
-cfg = BaselineConfig(
+from src.policies.your_policy.configuration import YourPolicyConfig
+from src.policies.baseline.processor import make_baseline_pre_post_processors
+from src.policies.your_policy.modeling import YourPolicy
+```
+
+Update the **third cell** to instantiate your configuration:
+```python
+cfg = YourPolicyConfig(
     chunk_size=10,
     n_action_steps=10,
-
+    # Your custom parameters
 )
 ```
-change configuration class in **second** cell.
+Update the **fifth cell** to build preprocessor and postprocessor
 ```python
-'''`
-Instantiate Policy
-'''
-policy = BaselinePolicy(**kwargs)
+preprocessor, postprocessor = make_baseline_pre_post_processors(
+        config=cfg,
+        dataset_stats= ds_meta.stats
+    )
 ```
-Finally, change policy class in the **fourth** cell.
-
-
-For evaluation [4.eval.ipynb](4.eval.ipynb), change 
+Update the **sixth cell** to instantiate your policy:
 ```python
-from src.policies.baseline.modeling import BaselinePolicy
+policy = YourPolicy(**kwargs)
 ```
-to your own path in the **first** cell and
+
+### 📝 Evaluating Your Custom Policy
+
+In `12.eval_custom.ipynb`, update the **first cell**:
 ```python
-policy = BaselinePolicy.from_pretrained(CKPT, **kwargs)
+from src.policies.your_policy.modeling import YourPolicy
 ```
-change policy class in the **third** cell. 
 
-
-## Others
-
-### Data collection with the leader arm
-First, launch the ROS2 package from ROBOTIS to turn on the leader. This requires ROS2. 
+Update the **third cell** to load your trained model:
+```python
+policy = YourPolicy.from_pretrained(CKPT, **kwargs)
 ```
+
+---
+
+## 📡 Data Collection with Leader Arm
+
+### ✋ Prerequisites
+- ✅ ROS2 installed on your system
+- ✅ ROBOTIS Open Manipulator hardware
+- ✅ Leader arm setup complete
+
+### 🔧 Procedure
+
+**Terminal 1:** Launch ROS2 hardware driver
+```bash
 ros2 launch open_manipulator_bringup hardware_y_leader.launch.py
 ```
-Then, with the other terminal run 
-```
+
+**Terminal 2:** Run leader arm interface
+```bash
 python leader.py
 ```
 
-Finally, on the third terminal, run
-```
+**Terminal 3:** Start data collection
+```bash
 python collect_data.py
 ```
-to collect the data!
 
-## Contact Information
-```
-Jeongeun Park: baro0906@korea.ac.kr
-```
+💾 Your collected data will be saved in the dataset directory!
+
+---
+
+## 💬 Contact
+
+**👤 Jeongeun Park**  
+📧 Email: [baro0906@korea.ac.kr](mailto:baro0906@korea.ac.kr)
+
+---
+
+<div align="center">
+
+Made with ❤️ for robot learning research
+
+</div>
