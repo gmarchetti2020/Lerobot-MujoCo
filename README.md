@@ -1,10 +1,10 @@
-# 🤖 LeRobot MuJoCo Tutorial v2
+# 🤖 LeRobot MuJoCo VLA Tutorial
 
 A comprehensive tutorial for training and evaluating custom robotic manipulation policies using LeRobot and MuJoCo simulation.
 
 ## 📋 Table of Contents
 
-- [🤖 LeRobot MuJoCo Tutorial v2](#-lerobot-mujoco-tutorial-v2)
+- [🤖 LeRobot MuJoCo VLA Tutorial](#-lerobot-mujoco-vla-tutorial)
   - [📋 Table of Contents](#-table-of-contents)
   - [🚀 Installation](#-installation)
   - [📁 Dataset: Teleoperation and Visualization](#-dataset-teleoperation-and-visualization)
