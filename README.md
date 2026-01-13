@@ -37,6 +37,7 @@ A comprehensive tutorial for training and evaluating custom robotic manipulation
 pip install -r requirements.txt
 pip install flash-attn==2.7.3 --no-build-isolation
 ```
+Installing flash attention takes long time!
 
 ## 📁 Dataset: Teleoperation and Visualization
 
@@ -185,15 +186,22 @@ lerobot-train \
 
 <img src="./media/pi05.gif" width="480" height="360"></img>
 
-| Model | Pi0.5 | Gr00T N1.5|
-|-------|-------|--------|
-|Success Rate| 80% |
-|Repository 🤗| [Jeongeun/tutorial_v2_pi05](https://huggingface.co/Jeongeun/tutorial_v2_pi05) | [Jeongeun/tutorial_v2_groot](https://huggingface.co/Jeongeun/tutorial_v2_groot)
+| Model | Pi0.5 | Gr00T N1.5| Pi0|
+|-------|-------|--------|------|
+|Success Rate| 80% | | 100%
+|Repository 🤗| [Jeongeun/tutorial_v2_pi05](https://huggingface.co/Jeongeun/tutorial_v2_pi05) | [Jeongeun/tutorial_v2_groot](https://huggingface.co/Jeongeun/tutorial_v2_groot) | [Jeongeun/tutorial_v2_pi0](https://huggingface.co/Jeongeun/tutorial_v2_pi0)
 
 ### 📊 Pi-0.5 Evaluation
 **File:** `3.eval_pi05.ipynb`
 
 Evaluate the trained Pi-0.5 model on your environment.
+
+Quick Start
+```bash
+python download_data.py --type pi05
+python download_data.py --type groot
+# python download_data.py --type pi0
+```
 
 
 **Prerequisites:**
