@@ -7,14 +7,15 @@ A comprehensive tutorial for training and evaluating custom robotic manipulation
 - [🤖 LeRobot MuJoCo Tutorial v2](#-lerobot-mujoco-tutorial-v2)
   - [📋 Table of Contents](#-table-of-contents)
   - [🚀 Installation](#-installation)
-  - [📁 Project Structure](#-project-structure)
+  - [📁 Dataset: Teleoperation and Visualization](#-dataset-teleoperation-and-visualization)
     - [⌨️ Keyboard Teleoperation Demo](#️-keyboard-teleoperation-demo)
     - [📊 Dataset Visualization](#-dataset-visualization)
   - [🏋️ Baseline Model Training](#️-baseline-model-training)
     - [📌 Pi-0.5 Training](#-pi-05-training)
     - [🚀 GR00TN1.5 Training](#-gr00tn15-training)
-  - [📈 Model Evaluation](#-model-evaluation)
+  - [📈 Baseline Model Evaluation](#-baseline-model-evaluation)
     - [📊 Pi-0.5 Evaluation](#-pi-05-evaluation)
+    - [📊 GR00T N1.5 Evaluation](#-gr00t-n15-evaluation)
   - [Custom Policy Training and Evaluation](#custom-policy-training-and-evaluation)
     - [🔄 Data Transformation](#-data-transformation)
     - [🎓 Custom Policy Training](#-custom-policy-training)
@@ -36,7 +37,7 @@ A comprehensive tutorial for training and evaluating custom robotic manipulation
 pip install -r requirements.txt
 ```
 
-## 📁 Project Structure
+## 📁 Dataset: Teleoperation and Visualization
 
 ### ⌨️ Keyboard Teleoperation Demo
 **File:** `0.teleop.ipynb`
@@ -178,7 +179,7 @@ lerobot-train \
 - Optional: Pushed to Hugging Face Hub if configured
 
 **⏱️ Training Time:** ~1-2 hours on single GPU
-## 📈 Model Evaluation
+## 📈 Baseline Model Evaluation
 ### 📊 Pi-0.5 Evaluation
 **File:** `3.eval_pi05.ipynb`
 
@@ -226,6 +227,50 @@ MAX_EPISODE_STEPS = 10_000
 
 **Output:** Average success rate over 20 episodes
 
+### 📊 GR00T N1.5 Evaluation
+**File:** `4.eval_groot.ipynb`
+
+**Prereq:**  
+```bash
+pip install ninja "packaging>=24.2,<26.0" peft dm-tree==0.1.9 -U transformers
+pip install flash-attn==2.7.3 --no-build-isolation
+```
+
+**Minimal setup:**
+```python
+from lerobot.policies.groot.modeling_groot import GrootPolicy
+from lerobot.processor import PolicyProcessorPipeline
+from lerobot.utils.constants import POLICY_PREPROCESSOR_DEFAULT_NAME, POLICY_POSTPROCESSOR_DEFAULT_NAME
+from src.env.env import RILAB_OMY_ENV
+from lerobot.processor.converters import *
+import json, torch
+
+repo_id_or_path = "Jeongeun/tutorial_v2_groot"
+device = "cuda"
+
+policy = GrootPolicy.from_pretrained(repo_id_or_path).to(device)
+
+# overrides to normalize/unnormalize with dataset stats and slice to env action dim
+pre = PolicyProcessorPipeline.from_pretrained(
+    repo_id_or_path,
+    config_filename=f"{POLICY_PREPROCESSOR_DEFAULT_NAME}.json",
+    overrides={"groot_pack_inputs_v3": {"stats": None, "normalize_min_max": True}},
+    to_transition=batch_to_transition,
+    to_output=transition_to_batch,
+)
+post = PolicyProcessorPipeline.from_pretrained(
+    repo_id_or_path,
+    config_filename=f"{POLICY_POSTPROCESSOR_DEFAULT_NAME}.json",
+    overrides={"groot_action_unpack_unnormalize_v1": {"stats": None, "normalize_min_max": True, "env_action_dim": policy.config.output_features["action"].shape[0]}},
+    to_transition=policy_action_to_transition,
+    to_output=transition_to_policy_action,
+)
+
+env_conf = json.load(open("./configs/train.json"))
+omy_env = RILAB_OMY_ENV(cfg=env_conf, action_type="joint", obs_type="joint_pos", vis_mode="teleop")
+```
+
+**Run:** Same loop as Pi-0.5 — 20 episodes, max 10k steps, report average success.
 
 ## Custom Policy Training and Evaluation
 ### 🔄 Data Transformation
