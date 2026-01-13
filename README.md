@@ -10,12 +10,13 @@ A comprehensive tutorial for training and evaluating custom robotic manipulation
   - [📁 Dataset: Teleoperation and Visualization](#-dataset-teleoperation-and-visualization)
     - [⌨️ Keyboard Teleoperation Demo](#️-keyboard-teleoperation-demo)
     - [📊 Dataset Visualization](#-dataset-visualization)
-  - [🏋️ Baseline Model Training](#️-baseline-model-training)
+  - [🏋️ VLA Model Training](#️-vla-model-training)
     - [📌 Pi-0.5 Training](#-pi-05-training)
     - [🚀 GR00TN1.5 Training](#-gr00tn15-training)
   - [📈 Baseline Model Evaluation](#-baseline-model-evaluation)
     - [📊 Pi-0.5 Evaluation](#-pi-05-evaluation)
     - [📊 GR00T N1.5 Evaluation](#-gr00t-n15-evaluation)
+    - [📊 Pi-0 Evaluation](#-pi-0-evaluation)
   - [Custom Policy Training and Evaluation](#custom-policy-training-and-evaluation)
     - [🔄 Data Transformation](#-data-transformation)
     - [🎓 Custom Policy Training](#-custom-policy-training)
@@ -105,7 +106,7 @@ lerobot-train \
     --policy.dtype=bfloat16 \
     --policy.freeze_vision_encoder=false \
     --policy.train_expert_only=false \
-    --steps=5000 \
+    --steps=10000 \
     --log_freq=50 \
     --eval_freq=-1 \
     --policy.device=cuda \
@@ -119,7 +120,7 @@ lerobot-train \
 |-----------|-------|-------------|
 | `policy.type` | `pi05` | Policy architecture type |
 | `policy.pretrained_path` | `lerobot/pi05_base` | Pre-trained model checkpoint |
-| `policy.compile_model` | `true` | Enable model compilation for faster inference |
+| `policy.compile_model` | `false` | Disable model compilation for faster inference and training |
 | `policy.dtype` | `bfloat16` | Use bfloat16 for memory efficiency |
 | `steps` | `5000` | Total training steps |
 | `batch_size` | `32` | Batch size for training |
@@ -156,7 +157,10 @@ lerobot-train \
     --policy.type=groot \
     --policy.push_to_hub=true \
     --policy.repo_id={YOUR REPO} \
-    --policy.tune_diffusion_model=false \
+    --policy.tune_diffusion_model=true \
+    --policy.tune_llm=false \
+    --policy.tune_visual=false \
+    --policy.tune_projector=true \
     --output_dir=ckpt/tutorial_v2_groot \
     --job_name=tutorial_v2_groot \
     --wandb.enable=false \
@@ -170,7 +174,10 @@ lerobot-train \
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | `policy.type` | `groot` | Policy architecture type (Generalist Robot Transformer) |
-| `policy.tune_diffusion_model` | `false` | Disable diffusion model fine-tuning |
+| `policy.tune_diffusion_model` | `true` | Enable diffusion model fine-tuning |
+| `policy.tune_projector` | `true` | Enable projector for new embodiment training|
+| `policy.tune_visual` | `false` | Disable vision encoder fine-tuning |
+| `policy.tune_llm` | `false` | Disable LLM backbone fine-tuning |
 | `steps` | `3000` | Total training steps |
 | `batch_size` | `32` | Batch size for training |
 | `chunk_size` | `20` | Action chunk size |
