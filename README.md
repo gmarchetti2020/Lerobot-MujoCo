@@ -10,7 +10,12 @@ A comprehensive tutorial for training and evaluating custom robotic manipulation
   - [📁 Project Structure](#-project-structure)
     - [⌨️ Keyboard Teleoperation Demo](#️-keyboard-teleoperation-demo)
     - [📊 Dataset Visualization](#-dataset-visualization)
-    - [🏋️ Model Training](#️-model-training)
+  - [🏋️ Baseline Model Training](#️-baseline-model-training)
+    - [📌 Pi-0.5 Training](#-pi-05-training)
+    - [🚀 GR00T Training](#-gr00t-training)
+  - [📈 Model Evaluation](#-model-evaluation)
+    - [📊 Pi-0.5 Evaluation](#-pi-05-evaluation)
+  - [Custom Policy Training and Evaluation](#custom-policy-training-and-evaluation)
     - [🔄 Data Transformation](#-data-transformation)
     - [🎓 Custom Policy Training](#-custom-policy-training)
     - [✅ Custom Policy Evaluation](#-custom-policy-evaluation)
@@ -66,14 +71,163 @@ dataset = LeRobotDataset('Jeongeun/tutorial_v2', root=root)
 
 Running this code will automatically download the dataset.
 
-### 🏋️ Model Training
-**Files:** 
-- `2.train.ipynb` - Baseline model training
-- `3.eval_pi05.ipynb` - Pi-0.5 model evaluation
-- `4.eval_groot.ipynb` - GRooT model evaluation
 
-Train and evaluate baseline models with your data.
+## 🏋️ Baseline Model Training
 
+### 📌 Pi-0.5 Training
+**File:** `2.train.ipynb` (First Section)
+
+Train Pi-0.5 model on your dataset using the LeRobot training pipeline.
+
+**Prerequisites:**
+```bash
+pip uninstall -y transformers
+pip install git+https://github.com/huggingface/transformers.git@fix/lerobot_openpi
+```
+
+**Training Command:**
+```bash
+lerobot-train \
+    --dataset.repo_id=Jeongeun/tutorial_v2 \
+    --dataset.root=dataset/leader_data \
+    --policy.type=pi05 \
+    --policy.push_to_hub=true \
+    --policy.repo_id={YOUR REPO} \
+    --output_dir=./ckpt/tutorial_v2_pi05 \
+    --job_name=tutorial_v2_pi05 \
+    --policy.pretrained_path=lerobot/pi05_base \
+    --policy.compile_model=true \
+    --policy.gradient_checkpointing=true \
+    --wandb.enable=false \
+    --policy.dtype=bfloat16 \
+    --policy.freeze_vision_encoder=false \
+    --policy.train_expert_only=false \
+    --steps=5000 \
+    --log_freq=50 \
+    --eval_freq=-1 \
+    --policy.device=cuda \
+    --policy.chunk_size=20 \
+    --policy.n_action_steps=20 \
+    --batch_size=32
+```
+
+**Key Parameters:**
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| `policy.type` | `pi05` | Policy architecture type |
+| `policy.pretrained_path` | `lerobot/pi05_base` | Pre-trained model checkpoint |
+| `policy.compile_model` | `true` | Enable model compilation for faster inference |
+| `policy.dtype` | `bfloat16` | Use bfloat16 for memory efficiency |
+| `steps` | `5000` | Total training steps |
+| `batch_size` | `32` | Batch size for training |
+| `chunk_size` | `20` | Action chunk size |
+| `n_action_steps` | `20` | Number of action prediction steps |
+
+**Output:** 
+- Trained model saved to `./ckpt/tutorial_v2_pi05`
+- Optional: Pushed to Hugging Face Hub if `push_to_hub=true`
+
+**⏱️ Training Time:** ~2-4 hours on single GPU
+
+---
+
+### 🚀 GR00T Training
+**File:** `2.train.ipynb` (Second Section)
+
+Train GR00T N 1.5 model on your dataset.
+
+**Prerequisites:**
+```bash
+pip install ninja "packaging>=24.2,<26.0"
+pip install peft
+pip install dm-tree==0.1.9
+pip install -U transformers
+pip install flash-attn==2.7.3 --no-build-isolation
+```
+
+**Training Command:**
+```bash
+lerobot-train \
+    --dataset.repo_id=Jeongeun/tutorial_v2 \
+    --dataset.root=dataset/leader_data \
+    --policy.type=groot \
+    --policy.push_to_hub=true \
+    --policy.repo_id={YOUR REPO} \
+    --policy.tune_diffusion_model=false \
+    --output_dir=ckpt/tutorial_v2_groot \
+    --job_name=tutorial_v2_groot \
+    --wandb.enable=false \
+    --steps=3000 \
+    --policy.chunk_size=20 \
+    --policy.n_action_steps=20 \
+    --batch_size=32
+```
+
+**Key Parameters:**
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| `policy.type` | `groot` | Policy architecture type (Generalist Robot Transformer) |
+| `policy.tune_diffusion_model` | `false` | Disable diffusion model fine-tuning |
+| `steps` | `3000` | Total training steps |
+| `batch_size` | `32` | Batch size for training |
+| `chunk_size` | `20` | Action chunk size |
+| `n_action_steps` | `20` | Number of action prediction steps |
+
+**Output:**
+- Trained model saved to `ckpt/tutorial_v2_groot`
+- Optional: Pushed to Hugging Face Hub if configured
+
+**⏱️ Training Time:** ~1-2 hours on single GPU
+## 📈 Model Evaluation
+### 📊 Pi-0.5 Evaluation
+**File:** `3.eval_pi05.ipynb`
+
+Evaluate the trained Pi-0.5 model on your environment.
+
+**Prerequisites:**
+```bash
+pip uninstall -y transformers
+pip install git+https://github.com/huggingface/transformers.git@fix/lerobot_openpi
+```
+
+**Key Setup:**
+```python
+from lerobot.policies.pi05.modeling_pi05 import PI05Policy
+from lerobot.processor import PolicyProcessorPipeline
+from src.env.env import RILAB_OMY_ENV
+
+# Load model
+repo_id_or_path = 'Jeongeun/tutorial_v2_pi05'
+policy = PI05Policy.from_pretrained(repo_id_or_path)
+policy.to('cuda')
+
+# Load preprocessor/postprocessor
+preprocessor = PolicyProcessorPipeline.from_pretrained(repo_id_or_path, ...)
+postprocessor = PolicyProcessorPipeline.from_pretrained(repo_id_or_path, ...)
+
+# Load environment
+env_conf = json.load(open('./configs/train.json'))
+omy_env = RILAB_OMY_ENV(cfg=env_conf, action_type='joint', obs_type='joint_pos')
+```
+
+**Evaluation Configuration:**
+```python
+TEST_EPISODES = 20
+MAX_EPISODE_STEPS = 10_000
+```
+
+**Run Evaluation:**
+- Loops through episodes
+- Captures agent and wrist camera images (256×256)
+- Preprocesses observations
+- Selects actions via policy
+- Postprocesses actions and steps environment
+- Reports success rate
+
+**Output:** Average success rate over 20 episodes
+
+
+## Custom Policy Training and Evaluation
 ### 🔄 Data Transformation
 **File:** `10.transform.ipynb`
 
