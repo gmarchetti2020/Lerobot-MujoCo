@@ -19,5 +19,5 @@ elif args.type == 'pi0':
 
 elif args.type == 'groot':
     from lerobot.policies.groot.modeling_groot import GrootPolicy
-    repo_id_or_path = 'Jeongeun/tutorial_v2_groot' 
+    repo_id_or_path = 'Jeongeun/tutorial_v2_grootn15' 
     policy = GrootPolicy.from_pretrained(repo_id_or_path)

@@ -193,10 +193,10 @@ lerobot-train \
 
 <img src="./media/pi05.gif" width="480" height="360"></img>
 
-| Model | Pi0.5 | Gr00T N1.5| Pi0|
+| Model | Pi0.5 | GR00T N1.5| Pi0|
 |-------|-------|--------|------|
-|Success Rate| 80% | | 100%
-|Repository 🤗| [Jeongeun/tutorial_v2_pi05](https://huggingface.co/Jeongeun/tutorial_v2_pi05) | [Jeongeun/tutorial_v2_groot](https://huggingface.co/Jeongeun/tutorial_v2_groot) | [Jeongeun/tutorial_v2_pi0](https://huggingface.co/Jeongeun/tutorial_v2_pi0)
+|Success Rate| 80% | 75% | 100%
+|Repository 🤗| [Jeongeun/tutorial_v2_pi05](https://huggingface.co/Jeongeun/tutorial_v2_pi05) | [Jeongeun/tutorial_v2_grootn15](https://huggingface.co/Jeongeun/tutorial_v2_grootn15 | [Jeongeun/tutorial_v2_pi0](https://huggingface.co/Jeongeun/tutorial_v2_pi0)
 
 ### 📊 Pi-0.5 Evaluation
 **File:** `3.eval_pi05.ipynb`
