@@ -79,17 +79,14 @@ class RILAB_OMY_ENV:
         if leader_pose:
             q_zero = np.array([-0.02914743, -1.5657328,   2.6794806 , -1.1105849 ,  1.5718971  ,-0.01073957])
         else:
-            robot_cfg = self.cfg['init_pose']['robot']
-            init_eef_pos = np.array(robot_cfg.get('init_eef_position', [0.3, -0.1, 1.0]))
-            init_eef_rot = np.deg2rad(robot_cfg.get('init_eef_rotation', [90, 0, 90]))
-            q_init = np.deg2rad(robot_cfg.get('init_q', [0, 0, 0, 0, 0, 0]))
+            q_init = np.deg2rad([0,0,0,0,0,0])
             q_zero,ik_err_stack,ik_info = solve_ik(
                 env = self.env,
                 joint_names_for_ik = self.joint_names,
                 body_name_trgt     = 'tcp_link',
                 q_init       = q_init, # ik from zero pose
-                p_trgt       = init_eef_pos,
-                R_trgt       = rpy2r(init_eef_rot),
+                p_trgt       = np.array([0.3,-0.1,1.0]),
+                R_trgt       = rpy2r(np.deg2rad([90,-0.,90 ])),
             )
         self.q_zero = q_zero
         # print(q_zero)
@@ -202,9 +199,11 @@ class RILAB_OMY_ENV:
     def render(self, task='', guideline='', fail_signal=False):
         self.env.plot_time()
         base_pos, base_R = self.env.get_pR_body(body_name='base')
-        p_current, R_current = self.env.get_pR_body(body_name=self.tcp_link_name)
+        p_current, R_current = self.env.get_pR_body(body_name=self.tcp_link_name) 
+        R_current = R_current @ np.array([[1,0,0],[0,0,1],[0,1,0 ]])
         self.env.plot_sphere(p=p_current, r=0.02, rgba=[0.95,0.05,0.05,0.5])
         self.env.plot_capsule(p=p_current, R=R_current, r=0.01, h=0.2, rgba=[0.05,0.95,0.05,0.5])
+        R_vertical = R_current @ np.array([[1,0,0],[0,0,1],[0,1,0 ]])
         self.env.viewer.plot_rgb_overlay(rgb=self.rgb_agent, loc='top right')
         self.env.viewer.plot_rgb_overlay(rgb=self.rgb_ego, loc='bottom right')
         self.env.viewer.plot_rgb_overlay(rgb=self.rgb_side, loc='top left')
