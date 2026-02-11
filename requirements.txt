@@ -5,7 +5,7 @@ scipy
 pyzmq
 torch==2.7.1 --index-url --index-url https://download.pytorch.org/whl/cu128
 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cu128
-transformers
+#transformers
 git+https://github.com/huggingface/lerobot.git@fbe4c8b94fdb1d62773e0f285f75aebb5b9ec27d
 
 ninja
@@ -15,7 +15,7 @@ peft
 
 
 # pi0.5
-# git+https://github.com/huggingface/transformers.git@fix/lerobot_openpi
+git+https://github.com/huggingface/transformers.git@fix/lerobot_openpi
 # # gr00t
 # # "torch>=2.2.1,<2.8.0" "torchvision>=0.21.0,<0.23.0" # --index-url https://download.pytorch.org/whl/cu1XX
 # ninja "packaging>=24.2,<26.0" # flash attention dependencies

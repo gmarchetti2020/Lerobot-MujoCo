@@ -17,7 +17,7 @@
     </default>
     <include file="./tabletop/object/floor_new.xml"/>
     <include file="./tabletop/object/object_table_3.xml"/>
-    <include file="./robotis_omy/omy2.xml"/>
+    <include file="./ur5e_rq2f85/ur5e_2f85.xml"/>
     <include file="./recp/wooden_cabinet/model_new.xml"/>
     <include file="./objects/box_1/model_new.xml"/>
     <include file="./objects/cylinder_1/model_new.xml"/>
