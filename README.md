@@ -2,6 +2,16 @@
 
 A comprehensive tutorial for training and evaluating custom robotic manipulation policies using LeRobot and MuJoCo simulation.
 
+## Release Notes
+
+11-02-2026 GM> I have added support for a UR5e roobot with a Robotiq 2f85 gripper. You can test the main scenario by running 0.teleop_ur5.ipynb. The model configuration files are in the asset directory, along with the original robotis_omy
+I'm now working on the rest of the pipeline, i.e.
+- data collection
+- training on Google Cloud, focusing on pi05 policies
+- evaluation
+- visualization
+The notebooks should require minimal modification, mainly to integrate with Vertex AI training jobs or similar mechanisms (e.g submit to slurm cluster).
+
 ## 📋 Table of Contents
 
 - [🤖 LeRobot MuJoCo VLA Tutorial](#-lerobot-mujoco-vla-tutorial)
