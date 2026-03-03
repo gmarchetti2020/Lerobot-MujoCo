@@ -40,9 +40,9 @@
                 0.0
             ],
             "init_eef_position": [
-                0.3,
+                0.36,
                 -0.1,
-                1.0
+                1.15
             ],
             "init_eef_rotation": [
                 180,
