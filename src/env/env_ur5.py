@@ -67,7 +67,7 @@ class RILAB_OMY_ENV:
                 azimuth            = 180, 
                 lookat            = [0.4,0.0,0.6], # None,
             )
-    def reset(self, seed = None, leader_pose = True):
+    def reset(self, seed = None, leader_pose = False):
         self.env.reset_wall_time()
         self.restore_original_color()
         if seed != None: np.random.seed(seed=seed) 
