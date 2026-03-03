@@ -90,6 +90,10 @@ class RILAB_OMY_ENV:
                 q_init       = q_init, # ik from zero pose
                 p_trgt       = init_eef_pos,
                 R_trgt       = rpy2r(init_eef_rot),
+                max_ik_tick  = 1000,
+                ik_err_th    = 1e-4,
+                ik_stepsize  = 2.0,
+                ik_eps       = 1e-3,
             )
         self.q_zero = q_zero
         # print(q_zero)
