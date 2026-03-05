@@ -1,5 +1,5 @@
 {
-    "language_instruction": "put block on the top drawer and close it",
+    "language_instruction": "Put the red cube in the open drawer then close the drawer",
     "xml_file": "./asset/scene_table_y2_ur5.xml",
     "control_mode": "delta_eef_pose",
     "conditions": 

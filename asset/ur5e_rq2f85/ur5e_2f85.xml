@@ -163,12 +163,7 @@
                     diaginertia="0.000132134 9.90863e-05 9.90863e-05"/>
                   <joint name="joint6"/>
                   <site name="joint6"/>
-                  <body name="camera_center" pos="0.0 0.09 0.1">
-                      <geom size="0.005 0.005 0.005" pos="0. 0. 0."
-                          contype="0" conaffinity="0"
-                          type="box" rgba="1.00 0.00 0.0 0" />
-                      <camera name="egocentric" pos="0 0 0" xyaxes="1 0 0 0 0 1" fovy="90" />
-                  </body>
+
                   <geom material="linkgray" mesh="wrist3" class="visual"/>
                   <geom class="eef_collision" pos="0 0.08 0" quat="1 1 0 0" size="0.04 0.02"/>
                   <body name="attachment" pos="0 0.1 0" quat="0.707107 -0.707107 0 0">
@@ -184,6 +179,12 @@
                         <site name="pinch" pos="0 0 0.145"/>
                         <body name="tcp_link" pos="0 0 0.145">
                           <geom type="sphere" size="0.005" rgba="0 1 0 0.5" contype="0" conaffinity="0"/>
+                        </body>
+                        <body name="camera_center" pos="0.0 0.06 0.03">
+                            <geom size="0.005 0.005 0.005" pos="0. 0. 0."
+                                contype="0" conaffinity="0"
+                                type="box" rgba="1.00 0.00 0.0 0" />
+                            <camera name="egocentric" pos="0 0 0" xyaxes="1 0 0 0 -0.906 -0.422" fovy="90" />
                         </body>
                         <body name="right_driver" pos="0 0.0306011 0.054904">
                           <inertial mass="0.00899563" pos="2.96931e-12 0.0177547 0.00107314"
