@@ -111,7 +111,7 @@ class RILAB_OMY_ENV:
         self.env.forward(q=q_zero,joint_names=self.joint_names,increase_tick=False)
         # self.env.forward(q = np.zeros(4), joint_names=['rh_r1', 'rh_r2', 'rh_l1', 'rh_l2' ], increase_tick=False)
         # Set other joints that is not in joint_names to 0
-        other_joint_names = set(self.env.joint_names) - set(self.joint_names) - set([None])
+        other_joint_names = set(self.env.joint_names) - set(self.joint_names) - set(["ctb_world_joint"])
         q_temp = np.zeros(len(other_joint_names))
         self.env.forward(q=q_temp,joint_names=list(other_joint_names),increase_tick=False)
         self.env.set_p_body(body_name='world', p=self.cfg['init_pose']['robot']['position'])
