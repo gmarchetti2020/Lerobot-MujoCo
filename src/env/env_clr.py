@@ -15,6 +15,13 @@ import copy
 from src.env.build_mjcf import build_mjcf_based_on_config
 
 class RILAB_OMY_ENV:
+    
+    # Making the camera names class variables, which will be updated by the config file
+    agent_view_camera_name: str = "wrist_mounted_camera" #"agentview"
+    egocerntric_camera_name: str = "lift_camera" #"egocentric"
+    top_view_camera_name: str = None # "topview" 
+    side_view_camera_name: str = None # "sideview" 
+    
     def __init__(self, 
                 cfg,
                 action_type='joint', 
@@ -193,18 +200,21 @@ class RILAB_OMY_ENV:
         joint_names = self.env.rev_joint_names[:10]
         self.env.forward(action, joint_names=joint_names)
 
-    def grab_image(self, return_side = False):
-        self.rgb_agent = self.env.get_fixed_cam_rgb(
-            cam_name='agentview')
-        self.rgb_ego = self.env.get_fixed_cam_rgb(
-            cam_name='egocentric')
-        # self.rgb_top = self.env.get_fixed_cam_rgbd_pcd(
-        #     cam_name='topview')
-        self.rgb_side = self.env.get_fixed_cam_rgb(
-            cam_name='sideview')
-        if return_side:
-            return self.rgb_agent, self.rgb_ego, self.rgb_side
-        return self.rgb_agent, self.rgb_ego
+    def grab_image(self):
+        self.rgb_agent, self.rgb_ego, self.rgb_top, self.rgb_side = None, None, None, None
+        
+        if self.agent_view_camera_name is not None:
+            self.rgb_agent = self.env.get_fixed_cam_rgb(cam_name=self.agent_view_camera_name)
+        if self.egocerntric_camera_name is not None:         
+            self.rgb_ego = self.env.get_fixed_cam_rgb(cam_name=self.egocerntric_camera_name)
+        
+        # CLR doesnt have those yet
+        if self.top_view_camera_name is not None: 
+            self.rgb_top = self.env.get_fixed_cam_rgbd_pcd(cam_name=self.top_view_camera_name)
+        if self.side_view_camera_name is not None: 
+            self.rgb_side = self.env.get_fixed_cam_rgb(cam_name=self.side_view_camera_name)
+
+        return self.rgb_agent, self.rgb_ego, self.rgb_top, self.rgb_side
         
 
     def render(self, task='', guideline='', fail_signal=False):
@@ -213,9 +223,18 @@ class RILAB_OMY_ENV:
         p_current, R_current = self.env.get_pR_body(body_name=self.tcp_link_name)
         self.env.plot_sphere(p=p_current, r=0.02, rgba=[0.95,0.05,0.05,0.5])
         self.env.plot_capsule(p=p_current, R=R_current, r=0.01, h=0.2, rgba=[0.05,0.95,0.05,0.5])
-        # self.env.viewer.plot_rgb_overlay(rgb=self.rgb_agent, loc='top right')
-        # self.env.viewer.plot_rgb_overlay(rgb=self.rgb_ego, loc='bottom right')
-        # self.env.viewer.plot_rgb_overlay(rgb=self.rgb_side, loc='top left')
+        
+        
+        if self.agent_view_camera_name is not None:
+            self.env.viewer.plot_rgb_overlay(rgb=self.rgb_agent, loc='top right')
+        if self.egocerntric_camera_name is not None:         
+            self.env.viewer.plot_rgb_overlay(rgb=self.rgb_ego, loc='bottom right')
+        # CLR doesnt have those yet
+        if self.top_view_camera_name is not None: 
+            self.env.viewer.plot_rgb_overlay(rgb=self.rgb_top, loc='bottom left')
+        if self.side_view_camera_name is not None: 
+            self.env.viewer.plot_rgb_overlay(rgb=self.rgb_side, loc='top left')
+
         self.env.plot_T(np.array([-0.3,-0.15,0.1]) + base_pos,label=task, plot_axis=False, plot_sphere=False)
         self.env.plot_T(np.array([-0.2,-0.15,0.12]) + base_pos,label=f"Guide: {guideline}", plot_axis=False, plot_sphere=False)
         
