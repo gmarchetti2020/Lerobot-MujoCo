@@ -55,7 +55,8 @@ class RILAB_OMY_ENV:
         self.joint_names = self.cfg['init_pose']['robot'].get('joint_names', ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']) 
         self.default_joint_states = self.cfg['init_pose']['robot'].get('default_joint_states', len(self.joint_names) * [0.0])
         self.tcp_link_name = self.cfg['init_pose']['robot'].get('eef_name', "tcp_link") 
-        self.obj_spawner = ObjectSpawner(self.env, cfg['init_pose'])
+        
+        # self.obj_spawner = ObjectSpawner(self.env, cfg['init_pose'])
         self.success_checker = condition_checker( self.env, cfg['conditions'], obj_names_all)
         self.init_viewer()
         self.reset(seed)
