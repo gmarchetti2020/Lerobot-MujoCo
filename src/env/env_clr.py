@@ -22,6 +22,9 @@ class RILAB_OMY_ENV:
     top_view_camera_name: str = None # "topview" 
     side_view_camera_name: str = None # "sideview" 
     
+    gripper_joints: list[str] = ["finger_1_joint", "finger_2_joint"] # ['rh_l1', 'rh_l2']
+    gripper_cmd = np.array([0.0])
+    
     def __init__(self, 
                 cfg,
                 action_type='joint', 
@@ -179,22 +182,26 @@ class RILAB_OMY_ENV:
             raise ValueError('action_type not recognized')
         
         # This is where they add additional dof for the end effector
-        
-        # if (self.action_type == 'eef_pose' or self.action_type == 'delta_eef_pose') and gripper_mode == 'binary':
-        #     if action[-1] > 0.5:
-        #         gripper_cmd = np.array([1.0]*2) #
-        #     else:
-        #         gripper_cmd = np.array([0.2]*2)
+        if (self.action_type == 'eef_pose' or self.action_type == 'delta_eef_pose') and gripper_mode == 'binary':
+            if action[-1] > 0.025 / 2.0:
+                # gripper_cmd = np.array([1.0]*2) #
+                self.gripper_cmd = np.array([0.025])
+            else:
+                # gripper_cmd = np.array([0.2]*2)
+                self.gripper_cmd = np.array([0.0])
+                
             # q = np.concatenate([q, gripper_cmd])
         # else:
-            # q = np.concatenate([q, np.array([-action[-1]]*2)])
+        #     q = np.concatenate([q, np.array([-action[-1]]*2)])
         self.q = q
-        # observation = self.get_observation()
-        # return observation
+        observation = self.get_observation()
+        return observation
 
     def step_env(self):
         # Avoiding the assumption that we are using the joint space, and instead using only the joint that we declare in the json config file.
         self.env.step(self.q, joint_names=self.joint_names)
+        self.env.step(self.gripper_cmd, joint_names=["finger_1_joint"])
+
 
     def forward_env(self, action):
         joint_names = self.env.rev_joint_names[:10]
