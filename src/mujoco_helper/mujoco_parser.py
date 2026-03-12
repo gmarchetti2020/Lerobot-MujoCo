@@ -896,10 +896,6 @@ class MuJoCoParserClass(object):
         
         # Controls
         self.n_ctrl           = self.model.nu # number of actuators (or controls)
-        for ctrl_idx in range(self.n_ctrl):
-            print(mujoco.mj_id2name(self.model,
-                              mujoco.mjtObj.mjOBJ_ACTUATOR,
-                              ctrl_idx))
              
         self.ctrl_names       = [mujoco.mj_id2name(self.model,mujoco.mjtObj.mjOBJ_ACTUATOR,ctrl_idx) 
                                  for ctrl_idx in range(self.n_ctrl)]
@@ -939,14 +935,9 @@ class MuJoCoParserClass(object):
         self.ctrl_qpos_maxs = []
         self.ctrl_qvel_idxs = []
         self.ctrl_types = []
-        print(self.joint_names)
-        print(self.ctrl_names)
         for ctrl_idx in range(self.n_ctrl):
             # transmission (joint) index attached to an actuator, we assume that there is just one joint attached
             joint_idx = self.model.actuator(self.ctrl_names[ctrl_idx]).trnid[0] 
-            print(self.model.actuator(self.ctrl_names[ctrl_idx]), self.model.actuator(self.ctrl_names[ctrl_idx]).trnid)
-            print(self.model.jnt_qposadr)
-            print(joint_idx, ctrl_idx)
             # joint position attached to control
             self.ctrl_qpos_idxs.append(self.model.jnt_qposadr[joint_idx])
             self.ctrl_qpos_names.append(self.joint_names[joint_idx])
