@@ -28,8 +28,8 @@
 
             <inertial pos="0 0 0" mass="1" diaginertia="0 0 0" />
 
-           <body name="camera" pos="1.2 0.0 1.6">
-                <camera name="agentview" pos="0 0 0" xyaxes="0 1 0 -0.707 0 0.707" fovy="60" />
+           <body name="camera" pos="1.523 0.000 1.436">
+                <camera name="agentview" pos="0 0 0" xyaxes="0.000 1.000 -0.000 -0.597 0.000 0.802" fovy="60" />
             </body>
 
             <body name="camera2" pos="0.5 0.0 1.8">
