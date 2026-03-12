@@ -14,7 +14,7 @@
     },
     "init_pose": {
         "robot": {
-            "eef_name": "finger_1_link",
+            "eef_name": "wrist_3_link",
             "position": [
                 0.0,
                 0.0,

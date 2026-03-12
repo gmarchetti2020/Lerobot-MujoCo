@@ -200,8 +200,7 @@ class RILAB_OMY_ENV:
 
     def step_env(self):
         # Avoiding the assumption that we are using the joint space, and instead using only the joint that we declare in the json config file.
-        self.env.step(self.q, joint_names=self.joint_names)
-        self.env.step(self.gripper_cmd, joint_names=["finger_1_joint"])
+        self.env.step(np.concatenate([self.q, self.gripper_cmd]), ctrl_names=self.joint_names + ["finger_1_joint"])
 
 
     def forward_env(self, action):
