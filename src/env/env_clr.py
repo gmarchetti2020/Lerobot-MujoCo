@@ -250,7 +250,7 @@ class RILAB_OMY_ENV:
 
 
     def get_observation(self):
-        gripper_state = self.env.get_qpos_joints(joint_names=['rh_l1', 'rh_l2'])
+        gripper_state = self.env.get_qpos_joints(joint_names=self.gripper_joints)
         if gripper_state[0] < 0.5:
             gripper_state_val = 0.0
         else:
@@ -261,24 +261,25 @@ class RILAB_OMY_ENV:
             eef_pose = self.get_ee_pose()
             eef_pose = np.concatenate([eef_pose, [gripper_state_val]], dtype=np.float32)
             return eef_pose
-        elif self.obs_type == 'full_state':
-            qpos = self.env.get_qpos_joints(joint_names=self.joint_names)
-            eef_pose = self.get_ee_pose()
-            gripper_state = self.env.get_qpos_joints(joint_names=['rh_l1', 'rh_l2'])
-            if gripper_state[0] < 0.5:
-                gripper_state_val = 0.0
-            else:
-                gripper_state_val = 1.0
-            eef_pose = np.concatenate([eef_pose, [gripper_state_val]], dtype=np.float32)
-            return np.concatenate([qpos, eef_pose], dtype=np.float32)
+        # elif self.obs_type == 'full_state':
+        #     qpos = self.env.get_qpos_joints(joint_names=self.joint_names)
+        #     eef_pose = self.get_ee_pose()
+        #     gripper_state = self.env.get_qpos_joints(joint_names=['rh_l1', 'rh_l2'])
+        #     if gripper_state[0] < 0.5:
+        #         gripper_state_val = 0.0
+        #     else:
+        #         gripper_state_val = 1.0
+        #     eef_pose = np.concatenate([eef_pose, [gripper_state_val]], dtype=np.float32)
+        #     return np.concatenate([qpos, eef_pose], dtype=np.float32)
         else:
             raise NotImplementedError(f"Observation type {self.obs_type} not implemented.")
     
     def solve_ik_eef_only(self, target_pos, target_R):
         pass
+    
     def get_joint_state(self):
         # Get the full joint state including gripper
-        q = self.env.get_qpos_joints(joint_names=self.joint_names + ['rh_r1', 'rh_r2'])
+        q = self.env.get_qpos_joints(joint_names=self.joint_names + self.gripper_joints)
         q = np.asarray(q, dtype=np.float32)
         return q
     
