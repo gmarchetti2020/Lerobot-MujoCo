@@ -41,8 +41,15 @@
                 "shoulder_pan_joint",
                 "wrist_1_joint",
                 "wrist_2_joint",
-                "wrist_3_joint",
-                "finger_1_joint"
+                "wrist_3_joint"
+            ],
+            "default_joint_states": [
+                -2.3058078289031982,
+                -0.7107666295817872,
+                3.052349805831909,
+                -3.2056271038451136,
+                -1.468212906514303,
+                0.03171319141983986
             ]
         },  
         "receptacles": {

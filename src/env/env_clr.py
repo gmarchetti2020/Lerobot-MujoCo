@@ -43,7 +43,7 @@ class RILAB_OMY_ENV:
         self.action_type = action_type
         self.obs_type = obs_type
         self.joint_names = self.cfg['init_pose']['robot'].get('joint_names', ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']) 
-        
+        self.default_joint_states = self.cfg['init_pose']['robot'].get('default_joint_states', len(self.joint_names) * [0.0])
         self.tcp_link_name = self.cfg['init_pose']['robot'].get('eef_name', "tcp_link") 
         self.obj_spawner = ObjectSpawner(self.env, cfg['init_pose'])
         self.success_checker = condition_checker( self.env, cfg['conditions'], obj_names_all)
@@ -81,8 +81,7 @@ class RILAB_OMY_ENV:
         idxs_step = self.env.get_idxs_step(joint_names=self.joint_names)
         # if 'joint' in self.action_type:
         if leader_pose:
-            # q_zero = np.array([-0.02914743, -1.5657328,   2.6794806 , -1.1105849 ,  1.5718971  ,-0.01073957])
-            q_zero = np.array([0.0] * len(self.joint_names))
+            q_zero = np.array(self.default_joint_states)
         else:
             robot_cfg = self.cfg['init_pose']['robot']
             init_eef_pos = np.array(robot_cfg.get('init_eef_position', [0.3, -0.1, 1.0]))
@@ -313,7 +312,6 @@ class RILAB_OMY_ENV:
         self.env.set_R_body(body_name=name, R=R)
 
     def check_success(self, verbose=False):
-        # print(self.env.model.geom_rgba.shape)
         return self.success_checker.check_success(verbose=verbose)
     
     def save_original_color(self):
