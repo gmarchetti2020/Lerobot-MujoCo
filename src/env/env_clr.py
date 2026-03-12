@@ -7,7 +7,7 @@ from src.object_helpers import ObjectSpawner
 from src.mujoco_helper.utils import prettify, sample_xyzs, rotation_matrix
 from src.mujoco_helper.ik import solve_ik
 from src.mujoco_helper.transforms import rpy2r, r2rpy
-from src.env.success_checker import condition_checker
+from src.env.success_checker_clr import condition_checker
 import os
 import mujoco
 import matplotlib.pyplot as plt
