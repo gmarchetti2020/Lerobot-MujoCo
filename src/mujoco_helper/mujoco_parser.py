@@ -896,6 +896,7 @@ class MuJoCoParserClass(object):
         
         # Controls
         self.n_ctrl           = self.model.nu # number of actuators (or controls)
+             
         self.ctrl_names       = [mujoco.mj_id2name(self.model,mujoco.mjtObj.mjOBJ_ACTUATOR,ctrl_idx) 
                                  for ctrl_idx in range(self.n_ctrl)]
         self.ctrl_ranges      = self.model.actuator_ctrlrange # control range
@@ -940,6 +941,7 @@ class MuJoCoParserClass(object):
             # joint position attached to control
             self.ctrl_qpos_idxs.append(self.model.jnt_qposadr[joint_idx])
             self.ctrl_qpos_names.append(self.joint_names[joint_idx])
+            
             self.ctrl_qpos_mins.append(self.joint_ranges[joint_idx,0])
             self.ctrl_qpos_maxs.append(self.joint_ranges[joint_idx,1])
             # joint velocity attached to control
