@@ -1,14 +1,16 @@
 import numpy as np
 from src.mujoco_helper import MuJoCoParserClass
 from src.mujoco_helper.transforms import r2rpy
-import src.object_helpers.receptacles as receptacles
+import src.object_helpers.receptacles_clr as receptacles
 mapper = {
     "microwave": [receptacles.Microwave],
     "white_slide_cabinet": [receptacles.WhiteSlideCabinet],
     "wooden_cabinet": [receptacles.WoodenCabinet],
     "wooden_slide_cabinet": [receptacles.WoodenSlideCabinet],
     "white_cabinet": [receptacles.WhiteCabinet],
+    "bench": [receptacles.Bench]
 }
+
 class condition_checker:
     def __init__(self, env: MuJoCoParserClass, conditions, obj_names):
         self.gripper_pose_offset = 0.05
