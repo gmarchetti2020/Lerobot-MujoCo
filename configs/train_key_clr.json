@@ -3,7 +3,9 @@
     "xml_file": "../../chonkur_l_raile/clr_mujoco_config/description/scene.xml",
     "control_mode": "delta_eef_pose",
     "conditions": {
-        "objects": [],
+        "objects": [
+            {"names": ["ctb", "bench_lid"], "relation": "on"}
+        ],
         "gripper": {
             "state": "open",
             "pose": [
@@ -44,12 +46,12 @@
                 "wrist_3_joint"
             ],
             "default_joint_states": [
-                -2.3058078289031982,
-                -0.7107666295817872,
-                3.052349805831909,
-                -3.2056271038451136,
-                -1.468212906514303,
-                0.03171319141983986
+                -2.089,
+                0.238,
+                1.189,
+                -0.985,
+                1.936,
+                0.0
             ]
         },  
         "receptacles": {
