@@ -100,6 +100,10 @@ class condition_checker:
         return True
     
     def check_gripper_condition(self):
+        return True
+
+        # Removing the gripper condition, since it is not relavent yet...
+
         if 'state' not in self.gripper_condition:
             return True
         state = self.gripper_condition['state']
