@@ -35,6 +35,11 @@ class RILAB_OMY_ENV:
                 build_mjcf = True):
         self.cfg = cfg
         xml_path = cfg['xml_file']
+        # Resolve xml_path relative to the project root (Lerobot-MujoCo/)
+        # so it works regardless of the notebook kernel's CWD.
+        if not os.path.isabs(xml_path):
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+            xml_path = os.path.abspath(os.path.join(project_root, xml_path))
         obj_configs = cfg['init_pose']
         self.vis_mode = vis_mode
         self.init_states = {}
@@ -123,6 +128,15 @@ class RILAB_OMY_ENV:
         # self.obj_spawner.spawn_recp()
         self.success_checker.reset(self.init_states)
         # self.obj_spawner.spawn_objects()
+        
+        for obj_name, obj_cfg in self.cfg['init_pose']['objects'].items():
+            if obj_name in self.env.body_names:
+                x = np.random.uniform(obj_cfg['x_range'][0], obj_cfg['x_range'][1])
+                y = np.random.uniform(obj_cfg['y_range'][0], obj_cfg['y_range'][1])
+                z = obj_cfg.get('z', 0.85)
+                yaw = np.random.uniform(obj_cfg['yaw_range'][0], obj_cfg['yaw_range'][1])
+                self.env.set_p_base_body(body_name=obj_name, p=[x, y, z])
+                self.env.set_R_base_body(body_name=obj_name, R=rpy2r(np.deg2rad([0, 0, yaw])))
 
         self.env.forward(increase_tick=False)
         self.p0, self.R0 = self.env.get_pR_body(body_name=self.tcp_link_name)
