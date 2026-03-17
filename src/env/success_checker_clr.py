@@ -148,7 +148,37 @@ class condition_checker:
             return self.check_on(obj1, obj2)
             
     def check_on(self, obj1, obj2):
-        target_size = self.env.model.site(obj2).size
+        # I am changing the 'check on' function for our current purposes. 
+        # First we check if the bodies are in contact with each other
+        # Second we check if z position of the target object is higher than that of the source object. 
+
+        contact_body_names = self.env.get_contact_body_names()
+
+        if [obj1, obj2] in contact_body_names or [obj2, obj1] in contact_body_names:
+            return True
+        else: 
+            return False
+        
+        # self.env.contact[]
+        
+        #      contact_body1 = self.body_names[self.model.geom_bodyid[contact.geom1]]
+        
+        # res = self.env.model.geom_aabb[obj1]
+        # print(res)
+        # print(target_size)
+        # Get the AABB (center and half-sizes in the geom's local frame)
+        # geom_aabb has 6 values: [center_x, center_y, center_z, halfSize_x, halfSize_y, halfSize_z]
+        # aabb_local = self.env.data.geom_aabb[geom_id]
+
+        # To transform to the world frame, you need the geom's world orientation (geom_xmat)
+        # and position (geom_xpos).
+        # geom_pos = self.env.data.geom_xpos[geom_id]
+        # geom_mat = self.env.data.geom_xmat[geom_id].reshape(3, 3)
+
+        # print(aabb_local, geom_pos, geom_mat)        
+        
+        
+        return False
         target_pose = self.env.get_p_site(site_name=obj2)
         target_R = self.env.get_R_site(site_name=obj2)
         yaw = r2rpy(target_R)[2]
