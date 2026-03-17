@@ -48,8 +48,6 @@ class condition_checker:
         return q_pos 
 
     def check_success(self, verbose=False):
-        return False
-
         if self.check_obj_condition(verbose=verbose) and self.check_gripper_condition():
             return True
         else:
