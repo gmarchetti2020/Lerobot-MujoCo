@@ -58,6 +58,16 @@ class condition_checker:
         for obj_name, func in self.must_loop_receptacles:
             func()
         for obj in self.obj_condition:
+            if obj['relation'] == 'on':
+                obj1, obj2 = obj['names']
+                if not self.is_on(obj1, obj2):
+                    if verbose:
+                        print(f"Failed on {obj1} to be {obj['relation']} {obj2}")
+                    return False
+            else:
+                print("Currently CLR support only 'on' relationship")    
+            
+            continue
             if obj['relation'] == "turn_on" or obj['relation'] == "turn_off":
                 cl_ = self.obj_attr[obj['names'][0]]
                 if not cl_.check_range(condition=obj['relation']):
