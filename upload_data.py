@@ -1,7 +1,7 @@
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 dataset = LeRobotDataset(
-    'Jeongeun/tutorial_v2', './dataset/leader_data'
+    'msavchen-nasa/clr_mujoco_dataset', './dataset/clr_teleoperation_dataset'
 )
 # dataset = LeRobotDataset(
 #     'Jeongeun/deep_learning_2025', './dataset/demo_data'
