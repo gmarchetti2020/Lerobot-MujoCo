@@ -174,6 +174,16 @@ def make_teleoperation_dataset(ROOT, repo_id="temp", action_dim=7, state_dim=10)
                     "shape": (256, 256, 3),
                     "names": ["height", "width", "channels"],
                 },
+                "observation.left_scene_image": {
+                    "dtype": "image",
+                    "shape": (256, 256, 3),
+                    "names": ["height", "width", "channels"],
+                },
+                "observation.right_scene_image": {
+                    "dtype": "image",
+                    "shape": (256, 256, 3),
+                    "names": ["height", "width", "channels"],
+                },
                 "observation.state": {
                     "dtype": "float32",
                     "shape": (state_dim,),
