@@ -19,8 +19,8 @@ class RILAB_OMY_ENV:
     # Making the camera names class variables, which will be updated by the config file
     agent_view_camera_name: str = "wrist_mounted_camera" #"agentview"
     egocerntric_camera_name: str = "lift_camera" #"egocentric"
-    top_view_camera_name: str = None # "topview" 
-    side_view_camera_name: str = None # "sideview" 
+    left_scene_camera: str = "left_scene_camera" # "topview" 
+    right_scene_camera: str = "right_scene_camera" # "sideview" 
     
     gripper_joints: list[str] = ["finger_1_joint", "finger_2_joint"] # ['rh_l1', 'rh_l2']
     gripper_cmd = np.array([0.0])
@@ -230,10 +230,10 @@ class RILAB_OMY_ENV:
             self.rgb_ego = self.env.get_fixed_cam_rgb(cam_name=self.egocerntric_camera_name)
         
         # CLR doesnt have those yet
-        if self.top_view_camera_name is not None: 
-            self.rgb_top = self.env.get_fixed_cam_rgbd_pcd(cam_name=self.top_view_camera_name)
-        if self.side_view_camera_name is not None: 
-            self.rgb_side = self.env.get_fixed_cam_rgb(cam_name=self.side_view_camera_name)
+        if self.left_scene_camera is not None: 
+            self.rgb_top = self.env.get_fixed_cam_rgb(cam_name=self.left_scene_camera)
+        if self.right_scene_camera is not None: 
+            self.rgb_side = self.env.get_fixed_cam_rgb(cam_name=self.right_scene_camera)
 
         return self.rgb_agent, self.rgb_ego, self.rgb_top, self.rgb_side
         
@@ -251,9 +251,9 @@ class RILAB_OMY_ENV:
         if self.egocerntric_camera_name is not None:         
             self.env.viewer.plot_rgb_overlay(rgb=self.rgb_ego, loc='bottom right')
         # CLR doesnt have those yet
-        if self.top_view_camera_name is not None: 
+        if self.left_scene_camera is not None: 
             self.env.viewer.plot_rgb_overlay(rgb=self.rgb_top, loc='bottom left')
-        if self.side_view_camera_name is not None: 
+        if self.right_scene_camera is not None: 
             self.env.viewer.plot_rgb_overlay(rgb=self.rgb_side, loc='top left')
 
         self.env.plot_T(np.array([-0.3,-0.15,0.1]) + base_pos,label=task, plot_axis=False, plot_sphere=False)
