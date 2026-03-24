@@ -308,18 +308,24 @@ class RILAB_OMY_ENV:
         return self.success_checker.check_success(verbose=verbose)
     
     def save_original_color(self):
-        self.original_colors = {}
-        for obj_name in self.object_names:
-            geom_name = obj_name + '_geom'
-            geom_idx = self.env.geom_names.index(geom_name)
-            self.original_colors[obj_name] = copy.deepcopy(self.env.model.geom_rgba[geom_idx])
+        try:
+            self.original_colors = {}
+            for obj_name in self.object_names:
+                geom_name = obj_name + '_geom'
+                geom_idx = self.env.geom_names.index(geom_name)
+                self.original_colors[obj_name] = copy.deepcopy(self.env.model.geom_rgba[geom_idx])
+        except ValueError:
+            pass
     
 
     def restore_original_color(self):
-        for obj_name in self.object_names:
-            geom_name = obj_name + '_geom'
-            geom_idx = self.env.geom_names.index(geom_name)
-            self.env.model.geom_rgba[geom_idx] = copy.deepcopy(self.original_colors[obj_name])
+        try:
+            for obj_name in self.object_names:
+                geom_name = obj_name + '_geom'
+                geom_idx = self.env.geom_names.index(geom_name)
+                self.env.model.geom_rgba[geom_idx] = copy.deepcopy(self.original_colors[obj_name])
+        except (ValueError, AttributeError):
+            pass
     
 
     def agument_object_random_color(self):
