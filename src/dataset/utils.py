@@ -54,12 +54,12 @@ def create_dataset(ROOT, add_images = True):
     if add_images:
         features["observation.image"] = {
                 "dtype": "image",
-                "shape": (256, 256, 3),
+                "shape": (448, 448, 3),
                 "names": ["height", "width", "channels"],
         }
         features["observation.wrist_image"] = {
                 "dtype": "image",
-                "shape": (256, 256, 3),
+                "shape": (448, 448, 3),
                 "names": ["height", "width", "channels"],
         }
     else:
@@ -120,8 +120,8 @@ def iterate_episodes(dataset,transformed_dataset, omy_env, ik_env,q_init, start_
             if args.observation_type == 'image':
                 agent_image = Image.fromarray(agent_image)
                 wrist_image = Image.fromarray(wrist_image)
-                agent_image = agent_image.resize((256, 256))
-                wrist_image = wrist_image.resize((256, 256))
+                agent_image = agent_image.resize((448, 448))
+                wrist_image = wrist_image.resize((448, 448))
                 agent_image = np.array(agent_image)
                 wrist_image = np.array(wrist_image)
                 frame["observation.image"] = agent_image
@@ -166,22 +166,22 @@ def make_teleoperation_dataset(ROOT, repo_id="temp", action_dim=7, state_dim=10)
             features={
                 "observation.image": {
                     "dtype": "image",
-                    "shape": (256, 256, 3),
+                    "shape": (448, 448, 3),
                     "names": ["height", "width", "channels"],
                 },
                 "observation.wrist_image": {
                     "dtype": "image",
-                    "shape": (256, 256, 3),
+                    "shape": (448, 448, 3),
                     "names": ["height", "width", "channels"],
                 },
                 "observation.left_scene_image": {
                     "dtype": "image",
-                    "shape": (256, 256, 3),
+                    "shape": (448, 448, 3),
                     "names": ["height", "width", "channels"],
                 },
                 "observation.right_scene_image": {
                     "dtype": "image",
-                    "shape": (256, 256, 3),
+                    "shape": (448, 448, 3),
                     "names": ["height", "width", "channels"],
                 },
                 "observation.state": {
