@@ -190,6 +190,7 @@ class RILAB_OMY_ENV:
             )
         elif self.action_type == 'joint':
             q = action[:-1]
+            self.gripper_cmd = np.array([action[-1]])
         elif self.action_type == 'delta_joint':
             q_current = self.env.get_qpos_joints(joint_names=self.joint_names)
             q = q_current + action[:-1]
@@ -197,12 +198,10 @@ class RILAB_OMY_ENV:
             raise ValueError('action_type not recognized')
         
         # This is where they add additional dof for the end effector
-        if (self.action_type == 'eef_pose' or self.action_type == 'delta_eef_pose') and gripper_mode == 'binary':
+        if gripper_mode == 'binary':
             if action[-1] > 0.025 / 2.0:
-                # gripper_cmd = np.array([1.0]*2) #
                 self.gripper_cmd = np.array([0.025])
             else:
-                # gripper_cmd = np.array([0.2]*2)
                 self.gripper_cmd = np.array([0.0])
                 
             # q = np.concatenate([q, gripper_cmd])
@@ -264,7 +263,7 @@ class RILAB_OMY_ENV:
 
     def get_observation(self):
         gripper_state = self.env.get_qpos_joints(joint_names=self.gripper_joints)
-        if gripper_state[0] < 0.5:
+        if gripper_state[0] < 0.0125:
             gripper_state_val = 0.0
         else:
             gripper_state_val = 1.0
