@@ -199,7 +199,7 @@ class RILAB_OMY_ENV:
         
         # This is where they add additional dof for the end effector
         if gripper_mode == 'binary':
-            if action[-1] > 0.025 / 2.0:
+            if action[-1] > 0.01875:
                 self.gripper_cmd = np.array([0.025])
             else:
                 self.gripper_cmd = np.array([0.0])
@@ -263,7 +263,7 @@ class RILAB_OMY_ENV:
 
     def get_observation(self):
         gripper_state = self.env.get_qpos_joints(joint_names=self.gripper_joints)
-        if gripper_state[0] < 0.0125:
+        if gripper_state[0] < 0.01875:
             gripper_state_val = 0.0
         else:
             gripper_state_val = 1.0
