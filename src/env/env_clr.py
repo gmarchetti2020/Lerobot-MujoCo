@@ -134,6 +134,7 @@ class RILAB_OMY_ENV:
                 x = np.random.uniform(obj_cfg['x_range'][0], obj_cfg['x_range'][1])
                 y = np.random.uniform(obj_cfg['y_range'][0], obj_cfg['y_range'][1])
                 z = obj_cfg.get('z', 0.85)
+
                 yaw = np.random.uniform(obj_cfg['yaw_range'][0], obj_cfg['yaw_range'][1])
                 self.env.set_p_base_body(body_name=obj_name, p=[x, y, z])
                 self.env.set_R_base_body(body_name=obj_name, R=rpy2r(np.deg2rad([0, 0, yaw])))
