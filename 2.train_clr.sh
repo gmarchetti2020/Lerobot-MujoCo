@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default parameters
-MODEL_TYPE=${1:-"smolvla"} # Options: "pi0", "pi05", "xvla", "wall_x", "smolvla"
+MODEL_TYPE=${1:-"pi0"} # Options: "pi0", "pi05", "xvla", "wall_x", "smolvla"
 EXPERIMENT_CONFIG=${2:-""}
 
 if [ -z "$EXPERIMENT_CONFIG" ]; then
@@ -134,7 +134,7 @@ printf "  %s\n" "${MODEL_FLAGS[@]}"
 accelerate launch \
     --multi_gpu \
     --num_machines=1 \
-    --num_processes=4 \
+    --num_processes=8 \
     --mixed_precision=bf16 \
     "$(which lerobot-train)" \
     --dataset.repo_id="$DATASET_REPO" \
