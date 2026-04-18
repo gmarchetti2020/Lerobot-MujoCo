@@ -12,6 +12,8 @@ ninja
 packaging>=24.2,<26.0
 dm-tree==0.1.9
 peft
+dotenv
+num2words
 
 
 # pi0.5
