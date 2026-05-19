@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default parameters
-MODEL_TYPE=${1:-"pi0"} # Options: "pi0", "pi05", "xvla", "wall_x", "smolvla"
+MODEL_TYPE=${1:-"pi0"} # Options: "pi0", "pi05", "xvla", "wall_x", "smolvla", "molmoact2"
 EXPERIMENT_CONFIG=${2:-""}
 
 if [ -z "$EXPERIMENT_CONFIG" ]; then
@@ -16,7 +16,7 @@ fi
 # Set NCCL environment variables for distributed training in GCP G4
 # single instance, multi-GPU setup. Adjust the interface name (e.g., "ens3") as needed.
 unset NCCL_NET
-export NCCL_SOCKET_IFNAME="ens3"
+export NCCL_SOCKET_IFNAME="ens7"
 export NCCL_P2P_LEVEL="PHB"
 export TOKENIZERS_PARALLELISM="false"
 
@@ -24,7 +24,7 @@ export TOKENIZERS_PARALLELISM="false"
 rm -rf ckpt
 rm -rf logs
 
-SUPPORTED_MODELS=("pi0" "pi05" "xvla" "wall_x" "smolvla")
+SUPPORTED_MODELS=("pi0" "pi05" "xvla" "wall_x" "smolvla" "molmoact2")
 if [[ ! " ${SUPPORTED_MODELS[@]} " =~ " ${MODEL_TYPE} " ]]; then
     echo "Error: Unknown MODEL_TYPE '${MODEL_TYPE}'. Choose from: ${SUPPORTED_MODELS[*]}"
     exit 1
@@ -125,6 +125,21 @@ case "$MODEL_TYPE" in
             "--policy.device=cuda"
         )
         ;;
+    "molmoact2")
+        MODEL_FLAGS=(
+            "--policy.type=molmoact2"
+            "--policy.device=cuda"
+            "--dataset.video_backend=pyav"
+            "--dataset.image_transforms.enable=true"
+            "--policy.action_mode=both"
+            "--policy.model_dtype=bfloat16"
+            "--policy.num_flow_timesteps=8"
+            "--policy.gradient_checkpointing=true"
+            "--policy.freeze_embedding=true"
+            "--policy.normalize_gripper=false"
+            "--policy.enable_knowledge_insulation=false"
+        )
+        ;;
 esac
 
 echo "Model-specific flags:"
@@ -134,7 +149,7 @@ printf "  %s\n" "${MODEL_FLAGS[@]}"
 accelerate launch \
     --multi_gpu \
     --num_machines=1 \
-    --num_processes=8 \
+    --num_processes=2 \
     --mixed_precision=bf16 \
     "$(which lerobot-train)" \
     --dataset.repo_id="$DATASET_REPO" \
