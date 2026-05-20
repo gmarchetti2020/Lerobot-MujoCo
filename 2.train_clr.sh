@@ -129,15 +129,13 @@ case "$MODEL_TYPE" in
         MODEL_FLAGS=(
             "--policy.type=molmoact2"
             "--policy.device=cuda"
-            "--dataset.video_backend=pyav"
             "--dataset.image_transforms.enable=true"
-            "--policy.action_mode=both"
+            "--policy.action_mode=continuous"
             "--policy.model_dtype=bfloat16"
-            "--policy.num_flow_timesteps=8"
             "--policy.gradient_checkpointing=true"
             "--policy.freeze_embedding=true"
             "--policy.normalize_gripper=false"
-            "--policy.enable_knowledge_insulation=false"
+            "--policy.enable_knowledge_insulation=true"
         )
         ;;
 esac
