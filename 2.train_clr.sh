@@ -19,6 +19,30 @@ unset NCCL_NET
 export NCCL_SOCKET_IFNAME="ens7"
 export NCCL_P2P_LEVEL="PHB"
 export TOKENIZERS_PARALLELISM="false"
+export PYTORCH_ALLOC_CONF="expandable_segments:True"
+
+# Make torch's bundled cuBLASLt (matches torch's cu12.8 build) win over any
+# system CUDA install on LD_LIBRARY_PATH / ldconfig (e.g. /usr/local/cuda-12.9).
+# Avoids "Invalid handle. Cannot load symbol cublasLtCreate" from minor-version drift.
+TORCH_NVIDIA_LIB=""
+# Ask the active Python interpreter directly so we can't glob into a stray
+# python3.x directory under $CONDA_PREFIX/lib.
+TORCH_NVIDIA_LIB="$(python -c '
+import os, sys
+try:
+    import nvidia.cublas
+    print(os.path.join(os.path.dirname(nvidia.cublas.__file__), "lib"))
+except Exception:
+    import torch
+    print(os.path.join(os.path.dirname(os.path.dirname(torch.__file__)), "nvidia", "cublas", "lib"))
+' 2>/dev/null)"
+if [ -n "$TORCH_NVIDIA_LIB" ] && [ -d "$TORCH_NVIDIA_LIB" ]; then
+    export LD_LIBRARY_PATH="$TORCH_NVIDIA_LIB:$LD_LIBRARY_PATH"
+    echo "[cublas-shim] LD_LIBRARY_PATH prepended with $TORCH_NVIDIA_LIB"
+else
+    echo "[cublas-shim] WARNING: could not locate torch's bundled cuBLAS lib dir." >&2
+    echo "[cublas-shim] Activate the mujoco2 conda env before running this script." >&2
+fi
 
 # Remove checkpoint and logs directories if they already exist to avoid conflicts
 rm -rf ckpt
@@ -136,6 +160,8 @@ case "$MODEL_TYPE" in
             "--policy.freeze_embedding=true"
             "--policy.normalize_gripper=false"
             "--policy.enable_knowledge_insulation=true"
+            "--policy.enable_lora_vlm=true"
+            "--policy.lora_rank=64"
         )
         ;;
 esac
